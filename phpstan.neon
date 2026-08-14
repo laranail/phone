@@ -1,0 +1,14 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - src
+        # Pest binds `$this` to a TestCase at runtime through a mechanism PHPStan cannot follow, so
+        # analysing the test closures produces a wall of `undefined property` noise that hides real
+        # findings. The base case is analysed; the specs are covered by running them.
+        - tests/TestCase.php
+    excludePaths:
+        - vendor
+    treatPhpDocTypesAsCertain: false

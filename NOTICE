@@ -1,0 +1,26 @@
+laranail/phone
+Copyright (c) 2026 Simtabi LLC
+Licensed under the MIT License. See LICENSE.
+
+This package depends on third-party software under a different licence.
+
+--------------------------------------------------------------------------------
+giggsey/libphonenumber-for-php
+--------------------------------------------------------------------------------
+
+Licensed under the Apache License, Version 2.0.
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+A PHP port of Google's libphonenumber. It supplies every parsing, validation and
+formatting decision this package makes, plus the geocoding, carrier and timezone
+metadata exposed on the value object. It is a `require`, not a `suggest` — the
+package does nothing without it.
+
+Apache-2.0 is permissive and compatible with the MIT licence above; the two
+coexist without either being relicensed. It is recorded here because Apache-2.0
+section 4(d) asks that attribution notices be carried, and because a consumer
+auditing licences downstream should not have to discover it from the lock file.
+
+The underlying phone-number metadata is Google's, distributed with that port
+under the same terms.

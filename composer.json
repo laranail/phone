@@ -1,0 +1,83 @@
+{
+    "name": "laranail/phone",
+    "description": "Phone numbers for Laravel — an immutable value object over libphonenumber, input normalisation, per-country input masks, Eloquent casts and a test-number factory.",
+    "keywords": ["laravel", "laranail", "simtabi", "phone", "phone-number", "libphonenumber", "e164", "msisdn"],
+    "homepage": "https://opensource.simtabi.com/products/laranail/phone",
+    "license": "MIT",
+    "authors": [
+        { "name": "Simtabi LLC", "email": "opensource@simtabi.com", "homepage": "https://opensource.simtabi.com", "role": "Organization" },
+        { "name": "Imani Manyara", "email": "imani@simtabi.com", "role": "Maintainer" }
+    ],
+    "support": {
+        "issues": "https://github.com/laranail/phone/issues",
+        "source": "https://github.com/laranail/phone",
+        "docs": "https://opensource.simtabi.com/documentation/laranail/phone/"
+    },
+    "require": {
+        "php": "^8.4.1 || ^8.5",
+        "ext-mbstring": "*",
+        "giggsey/libphonenumber-for-php": "^9.0",
+        "illuminate/cache": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/support": "^13.0",
+        "laranail/atlas": "^0.1",
+        "laranail/package-tools": "^0.1"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^4.0",
+        "rector/rector": "^2.5.8"
+    },
+    "suggest": {
+        "ext-intl": "Localised country names via Locale::getDisplayRegion(); without it, names fall back to laranail/atlas' English catalogue.",
+        "symfony/intl": "^7.0 || ^8.0 — deterministic localised country names that do not vary with the host's ICU version."
+    },
+    "autoload": {
+        "psr-4": {
+            "Simtabi\\Laranail\\Phone\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Simtabi\\Laranail\\Phone\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest --colors=always",
+        "test-coverage": "@test --coverage --min=90",
+        "lint": ["@pint", "@phpstan", "@rector"],
+        "pint": "vendor/bin/pint --test",
+        "pint-fix": "vendor/bin/pint",
+        "phpstan": "vendor/bin/phpstan analyse --no-progress",
+        "analyse": "@phpstan",
+        "rector": "vendor/bin/rector process --dry-run",
+        "rector-fix": "vendor/bin/rector process"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Simtabi\\Laranail\\Phone\\Providers\\PhoneServiceProvider"
+            ]
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "repositories": [
+        { "type": "vcs", "url": "https://github.com/laranail/atlas" },
+        { "type": "vcs", "url": "https://github.com/laranail/package-tools" },
+        { "type": "vcs", "url": "https://github.com/laranail/console" },
+        { "type": "vcs", "url": "https://github.com/laranail/enumerator" }
+    ],
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
