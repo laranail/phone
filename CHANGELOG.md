@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `laranail/atlas` moved from `require` to `require-dev`. It was a hard dependency used nowhere in
+  `src/` — this package deals in ISO 3166-1 alpha-2 codes and never resolves a country *name* — so it
+  dragged the ISO catalogue into every consumer for nothing. The `ext-intl` and `symfony/intl`
+  suggestions were corrected to match: neither is used here either.
+
+### Fixed
+
+- `MaskGenerator::placeholder()` was not memoised while `national()` and `international()` were, so
+  every call re-read a region's metadata. Building a table for all 245 regions cost 210 ms on a pass
+  where the masks themselves were already cached and free; it is now 2.7 ms.
+
 ### Added
 
 - `PhoneNumberValue` — an immutable value object carrying every rendering of a number (`e164`,

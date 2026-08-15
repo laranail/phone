@@ -24,9 +24,43 @@ php artisan vendor:publish --tag=laranail::phone-config
 
 Config resolves under the vendor-namespaced key `config('laranail.phone.*')`.
 
-## Documentation
+## <a name="documentation"></a>Documentation
 
-Full documentation is at **[opensource.simtabi.com/documentation/laranail/phone](https://opensource.simtabi.com/documentation/laranail/phone/)** — installation, getting started, the three formatting decisions, country resolution, validation, architecture, and per-subsystem reference for the value object, formatter, normalizer, mask generator, casts and factory.
+Full documentation is at
+**[opensource.simtabi.com/documentation/laranail/phone](https://opensource.simtabi.com/documentation/laranail/phone/)**.
+
+### Guides
+
+- [Installation](docs/installation.md) — Composer install, supported versions, the two optional extensions
+- [Getting started](docs/getting-started.md) — parse, store and display a number, end to end
+- [Configuration](docs/configuration.md) — five settings, all safe to leave alone
+- [Formats](docs/formats.md) — the four formats, and why only one belongs in a column
+- [Countries](docs/countries.md) — how a country is resolved, and why `+1` is not a country
+- [Validation](docs/validation.md) — why the rules live in `laranail/validation`, and the seam
+- [Architecture](docs/architecture.md) — the one libphonenumber contact point, and the rejected alternatives
+- [Release](docs/release.md) — versioning, tagging, and the CI-managed changelog
+
+### Reference
+
+- [`PhoneNumberValue`](docs/tools/value-objects.md) — thirteen properties and nine methods over one parsed number
+- [`PhoneFormatter`](docs/tools/formatter.md) — the parse entry point and its three-tier fallback
+- [`PhoneNormalizer`](docs/tools/normalizer.md) — what gets cleaned out of input before parsing
+- [`MaskGenerator`](docs/tools/mask-generator.md) — per-country input masks, and when it refuses to give one
+- [Eloquent casts](docs/tools/casts.md) — `AsPhoneNumber` and `E164`, and which to reach for
+- [`PhoneNumberFactory`](docs/tools/factory.md) — test numbers that are valid and belong to nobody
+- [`phoneNumber` macro](docs/tools/blueprint-macro.md) — the migration helper and the columns it creates
+
+### Recipes
+
+- [Store E.164 and a country column](docs/recipes/store-e164-and-country.md) — without letting the two drift
+- [Validate a mobile number](docs/recipes/validate-a-mobile-number.md) — reject landlines, short codes and wrong countries
+- [Normalise a legacy column](docs/recipes/normalise-a-legacy-column.md) — backfill without destroying the rows that fail
+- [Seed test numbers](docs/recipes/seed-test-numbers.md) — why an invented number is usually invalid
+- [Localise country names](docs/recipes/localise-country-names.md) — three catalogues, and why none ships here
+
+### Project
+
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Notice](NOTICE)
 
 ## Contributing & security
 
