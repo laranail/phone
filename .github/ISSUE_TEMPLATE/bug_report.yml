@@ -1,0 +1,72 @@
+name: Bug report
+description: Something in laranail/phone behaves differently from what it documents
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting it. The most useful thing you can give us is the **input** — the exact
+        string that went in — because a phone-number bug is almost always about one particular string, and a description of it
+        is rarely enough to reproduce.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what you got instead.
+      placeholder: |
+        `Phone::parse('0712 123456', 'KE')` returns ... but I expected ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce it
+      description: The smallest code that shows it, plus any non-default config.
+      render: php
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: The exact version, or the commit if you are on a dev checkout.
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: 8.4.3
+    validations:
+      required: true
+
+  - type: input
+    id: laravel-version
+    attributes:
+      label: Laravel version
+      placeholder: 13.25.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-systems
+    attributes:
+      label: Which operating systems does it happen on?
+      multiple: true
+      options:
+        - macOS
+        - Windows
+        - Linux
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Stack trace, related issues, or what you have already ruled out.

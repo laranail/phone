@@ -1,9 +1,11 @@
 # `prefer-lowest` is the leg that catches a constraint looser than the code: it resolves the oldest
 # versions composer.json permits, which is what a consumer on a conservative lockfile actually gets.
 #
-# `ext-intl` is installed on one leg only. Localised country names come from `Locale::getDisplayRegion()`
-# when the extension is present and fall back to atlas' English catalogue when it is not — a suite that
-# always has the extension never exercises the fallback, and the fallback is what most consumers get.
+# One leg runs with `ext-intl` REMOVED. This package does not use the extension — it deals in ISO
+# codes and never resolves a country name — and `composer.json` says so by listing it under `suggest`
+# rather than `require`. That claim is the thing being guarded: the day someone adds a `Locale::`
+# call, a suggest silently becomes a hidden requirement and every consumer without the extension
+# breaks at runtime rather than at install.
 
 name: Tests
 
@@ -62,8 +64,8 @@ jobs:
       - name: Run the suite
         run: composer test
 
-  # `ext-intl` is a `suggest`, so the matrix above — which always installs it — never proves the
-  # fallback path works. This leg removes it.
+  # The matrix above always installs `ext-intl`, so it cannot prove the package works without it.
+  # This leg removes it and runs the whole suite.
   without-intl:
     name: Without ext-intl
     runs-on: ubuntu-latest
@@ -72,11 +74,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # `:intl` DISABLES the extension. Merely leaving it off the list does not remove it — the
+      # runner's PHP ships with intl enabled, so an omission is a no-op and the leg passes while
+      # proving nothing. That is exactly what this job did until the assertion below caught it.
       - name: Setup PHP without intl
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: '8.5'
-          extensions: dom, curl, libxml, mbstring, zip, fileinfo
+          extensions: dom, curl, libxml, mbstring, zip, fileinfo, :intl
           coverage: none
 
       - name: Install dependencies
@@ -84,6 +89,8 @@ jobs:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
         run: composer update --prefer-stable --no-interaction --no-progress
 
+      # Without this the job is decorative: a green run would mean "the extension was present after
+      # all", which is the same result as the matrix legs.
       - name: Confirm the extension really is absent
         run: |
           php -r 'if (extension_loaded("intl")) { fwrite(STDERR, "ext-intl is loaded; this leg proves nothing.\n"); exit(1); }'
