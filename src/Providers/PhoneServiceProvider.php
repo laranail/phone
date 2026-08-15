@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Providers;
 
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Schema\Blueprint;
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 use Simtabi\Laranail\Phone\CountryReconciler;
 use Simtabi\Laranail\Phone\Enums\MatchLeniency;
+use Simtabi\Laranail\Phone\Http\ApiRoutes;
+use Simtabi\Laranail\Phone\Http\PhonePresenter;
 use Simtabi\Laranail\Phone\MaskGenerator;
+use Simtabi\Laranail\Phone\PhoneBatch;
 use Simtabi\Laranail\Phone\PhoneCatalogue;
 use Simtabi\Laranail\Phone\PhoneDialler;
 use Simtabi\Laranail\Phone\PhoneFormatter;
@@ -44,13 +49,15 @@ final class PhoneServiceProvider extends PackageServiceProvider
         $this->bindIntel();
         $this->bindFormatter();
         $this->bindDerived();
+        $this->bindHttp();
         $this->registerBlueprintMacro();
+        ApiRoutes::register($this->app->make(Repository::class));
     }
 
     private function bindNormalizer(): void
     {
         $this->app->singleton(PhoneNormalizer::class, fn (): PhoneNormalizer => new PhoneNormalizer(
-            convertVanityLetters: (bool) config('laranail.phone.convert_vanity_letters', false),
+            convertVanityLetters: config('laranail.phone.convert_vanity_letters', false) === true,
         ));
     }
 
@@ -59,37 +66,37 @@ final class PhoneServiceProvider extends PackageServiceProvider
         // Bound to the interface, so an application that wants to answer carrier lookups from its own
         // HLR service can swap the implementation without touching the value object.
         $this->app->singleton(ResolvesPhoneIntel::class, fn (): PhoneIntel => new PhoneIntel(
-            fallbackLocale: (string) (config('laranail.phone.intel.locale') ?? app()->getLocale()),
+            fallbackLocale: $this->string(config('laranail.phone.intel.locale')) ?? app()->getLocale(),
         ));
     }
 
     private function bindFormatter(): void
     {
-        $this->app->singleton(PhoneFormatter::class, fn ($app): PhoneFormatter => new PhoneFormatter(
+        $this->app->singleton(PhoneFormatter::class, fn (Application $app): PhoneFormatter => new PhoneFormatter(
             normalizer: $app->make(PhoneNormalizer::class),
             intel: config('laranail.phone.intel.enabled', true) === true
                 ? $app->make(ResolvesPhoneIntel::class)
                 : null,
-            defaultCountry: config('laranail.phone.default_country'),
+            defaultCountry: $this->string(config('laranail.phone.default_country')),
         ));
     }
 
     private function bindDerived(): void
     {
-        $this->app->singleton(MaskGenerator::class, fn ($app): MaskGenerator => new MaskGenerator(
+        $this->app->singleton(MaskGenerator::class, fn (Application $app): MaskGenerator => new MaskGenerator(
             formatter: $app->make(PhoneFormatter::class),
         ));
 
-        $this->app->singleton(CountryReconciler::class, fn ($app): CountryReconciler => new CountryReconciler(
+        $this->app->singleton(CountryReconciler::class, fn (Application $app): CountryReconciler => new CountryReconciler(
             formatter: $app->make(PhoneFormatter::class),
         ));
 
-        $this->app->singleton(PhoneNumberFactory::class, fn ($app): PhoneNumberFactory => new PhoneNumberFactory(
+        $this->app->singleton(PhoneNumberFactory::class, fn (Application $app): PhoneNumberFactory => new PhoneNumberFactory(
             formatter: $app->make(PhoneFormatter::class),
-            defaultCountry: (string) (config('laranail.phone.default_country') ?? 'US'),
+            defaultCountry: $this->string(config('laranail.phone.default_country')) ?? 'US',
         ));
 
-        $this->app->singleton(PhoneDialler::class, fn ($app): PhoneDialler => new PhoneDialler(
+        $this->app->singleton(PhoneDialler::class, fn (Application $app): PhoneDialler => new PhoneDialler(
             formatter: $app->make(PhoneFormatter::class),
         ));
 
@@ -99,21 +106,62 @@ final class PhoneServiceProvider extends PackageServiceProvider
         $this->app->singleton(ShortNumbers::class, fn (): ShortNumbers => new ShortNumbers);
 
         $this->app->singleton(PhoneScanner::class, fn (): PhoneScanner => new PhoneScanner(
-            defaultCountry: config('laranail.phone.default_country'),
-            leniency: MatchLeniency::tryFrom((string) config('laranail.phone.scanning.leniency', 'VALID'))
+            defaultCountry: $this->string(config('laranail.phone.default_country')),
+            leniency: MatchLeniency::tryFrom($this->string(config('laranail.phone.scanning.leniency')) ?? 'VALID')
                 ?? MatchLeniency::Valid,
-            limit: (int) config('laranail.phone.scanning.limit', PHP_INT_MAX),
+            limit: $this->int(config('laranail.phone.scanning.limit')) ?? PHP_INT_MAX,
+        ));
+
+        // Stateless over the formatter, so a singleton. Its memoisation is per-call and discarded
+        // with the pass — keying arbitrary user input for the lifetime of a worker would be an
+        // unbounded map, and the locality that makes it pay off is inside one list anyway.
+        $this->app->singleton(PhoneBatch::class, fn (Application $app): PhoneBatch => new PhoneBatch(
+            formatter: $app->make(PhoneFormatter::class),
         ));
 
         // The facade's accessor. Forwards the original five methods unchanged, so the surface is a
         // superset of what it was.
-        $this->app->singleton(PhoneManager::class, fn ($app): PhoneManager => new PhoneManager(
+        $this->app->singleton(PhoneManager::class, fn (Application $app): PhoneManager => new PhoneManager(
             formatter: $app->make(PhoneFormatter::class),
             dialler: $app->make(PhoneDialler::class),
             scanner: $app->make(PhoneScanner::class),
             catalogue: $app->make(PhoneCatalogue::class),
             shortNumbers: $app->make(ShortNumbers::class),
+            batch: $app->make(PhoneBatch::class),
         ));
+    }
+
+    /**
+     * The HTTP layer's own collaborators.
+     *
+     * Bound unconditionally even when the API is disabled, because they cost nothing until something
+     * resolves them and an application may want the presenter for its own controller — the wire
+     * format is useful whether or not this package owns the route.
+     */
+    private function bindHttp(): void
+    {
+        $this->app->singleton(PhonePresenter::class, fn (Application $app): PhonePresenter => new PhonePresenter(
+            formatter: $app->make(PhoneFormatter::class),
+            masks: $app->make(MaskGenerator::class),
+            catalogue: $app->make(PhoneCatalogue::class),
+        ));
+    }
+
+    /**
+     * A config value as a string, or null.
+     *
+     * `config()` returns `mixed` and a cast would paper over that rather than answer it: a
+     * `default_country` set to an array or a stray `true` in `.env` should fall back to the default,
+     * not become the string `"1"` and quietly parse every number against nothing.
+     */
+    private function string(mixed $value): ?string
+    {
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    private function int(mixed $value): ?int
+    {
+        return is_numeric($value) ? (int) $value : null;
     }
 
     /**

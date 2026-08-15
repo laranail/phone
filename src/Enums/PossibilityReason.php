@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Enums;
 
+use libphonenumber\NumberParseException;
 use libphonenumber\ValidationResult;
 
 /**
@@ -33,6 +34,17 @@ enum PossibilityReason: string
     /** A length no plan allows — neither too short nor too long, simply not a length in use. */
     case InvalidLength = 'INVALID_LENGTH';
 
+    /**
+     * The input never got as far as being a number.
+     *
+     * Distinct from every case above, all of which describe a number that *parsed* and then failed a
+     * check. This one is for a string the parser refused outright — an email address in the phone
+     * column, a name, an empty cell. Nothing about it can be repaired by adding or removing a digit,
+     * so it is the one failure that should be reported as "this is not a phone number" rather than as
+     * a length or a calling code.
+     */
+    case NotANumber = 'NOT_A_NUMBER';
+
     public static function fromLibPhoneNumber(ValidationResult $result): self
     {
         return match ($result) {
@@ -42,6 +54,24 @@ enum PossibilityReason: string
             ValidationResult::TOO_SHORT => self::TooShort,
             ValidationResult::TOO_LONG => self::TooLong,
             ValidationResult::INVALID_LENGTH => self::InvalidLength,
+        };
+    }
+
+    /**
+     * Why a parse *threw*, rather than why a parsed number failed a check.
+     *
+     * libphonenumber signals five distinct reasons here and they are worth keeping. Collapsing them
+     * all to "invalid" is how an audit of a truncated CSV column ends up reporting an unknown calling
+     * code for every row — the one answer that sends the operator looking in the wrong place.
+     */
+    public static function fromParseException(NumberParseException $exception): self
+    {
+        return match ($exception->getErrorType()) {
+            NumberParseException::TOO_SHORT_AFTER_IDD,
+            NumberParseException::TOO_SHORT_NSN => self::TooShort,
+            NumberParseException::TOO_LONG => self::TooLong,
+            NumberParseException::INVALID_COUNTRY_CODE => self::InvalidCountryCode,
+            default => self::NotANumber,
         };
     }
 
@@ -74,6 +104,7 @@ enum PossibilityReason: string
             self::TooShort => 'Too short',
             self::TooLong => 'Too long',
             self::InvalidLength => 'Not a valid length',
+            self::NotANumber => 'Not a phone number',
         };
     }
 }

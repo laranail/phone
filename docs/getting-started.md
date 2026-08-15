@@ -98,6 +98,22 @@ $contact->phone->whatsAppLink();  // 'https://wa.me/254712123456'
 $contact->phone->masked();        // '+254 ••• •••456'
 ```
 
+## More than one at a time
+
+Almost every real job is a list rather than a field. One pass answers both what each row is and what
+is wrong with the list:
+
+```php
+$audit = Phone::audit($csvColumn, 'KE');
+
+$audit->summary();    // ['total' => 1200, 'valid' => 1147, 'duplicates' => 38, …]
+$audit->reasons();    // ['TOO_SHORT' => 49] — the part an operator can act on
+$audit->distinct();   // the rows to keep, earliest-wins
+```
+
+See [Batch and audit](tools/batch.md), and
+[Audit a contact import](recipes/audit-a-contact-import.md) for the whole job.
+
 ## Validating it
 
 Validation lives in `laranail/validation`, not here — one rule, one home:
@@ -114,6 +130,9 @@ See [Validation](validation.md).
 
 - [Formats](formats.md) — the four formats and when each is the right one
 - [Countries](countries.md) — how a country is resolved, and the `+1` problem
+- [Fluent builder](tools/fluent-builder.md) — `Phone::of(...)`, for asking several questions at once
+- [Batch and audit](tools/batch.md) — judging a whole list
+- [HTTP API](tools/api.md) — reaching all of it from something that is not PHP
 - [Architecture](architecture.md) — why the package is shaped this way
 
 ---

@@ -1,7 +1,7 @@
 # Architecture
 
-Eight classes, one of which is allowed to touch libphonenumber. This page is the rationale — the
-"why", not the "what".
+Thirty-odd classes, one of which is allowed to touch libphonenumber. This page is the rationale —
+the "why", not the "what".
 
 ## The shape
 
@@ -11,11 +11,15 @@ PhoneNormalizer   →  PhoneFormatter  →  PhoneNumberValue
                        libphonenumber
                        contact point)
                             ↓
-              MaskGenerator · CountryReconciler · PhoneNumberFactory
-                       (all derive from the formatter)
+     MaskGenerator · CountryReconciler · PhoneNumberFactory · PhoneScanner
+     PhoneDialler · PhoneBatch          (all derive from the formatter)
                             ↓
-                    Casts\AsPhoneNumber · Casts\E164
+        Casts\AsPhoneNumber · Casts\E164 · Http\PhonePresenter
 ```
+
+`PhoneCatalogue` and `ShortNumbers` sit beside rather than below: they answer questions about the
+numbering *plan* rather than about a number, so they read libphonenumber's metadata directly and
+never parse anything.
 
 Everything downstream of `PhoneFormatter` asks it rather than libphonenumber. That single rule is
 what keeps the fallback behaviour in one place instead of at every call site.
@@ -102,12 +106,54 @@ parsed — and the parse is the expensive part.
 The cast therefore registers a per-class `saving` hook, keyed on the dispatcher's object id so a
 second model class does not re-register the same closure. See [Casts](tools/casts.md).
 
+## Why batch is a separate object, not a loop
+
+`Phone::audit()` could have been `array_map(Phone::parse(...), $rows)` and callers could have counted
+the results themselves. Three things make it worth its own pass.
+
+**Duplicate inputs are parsed once.** The reason to audit a list is that it is dirty, and a dirty
+list repeats itself — that is the thing being looked for. Memoising by input means the saving grows
+with exactly the mess that made the audit necessary, and no caller-written loop does that.
+
+**The verdict on the list is not the verdict on the rows.** "53 invalid" is not actionable; "49 too
+short" is a truncated export and one fix clears all of them. That breakdown only exists if something
+holds the whole pass, and if it comes from the same pass as the rows it cannot disagree with them.
+
+**Duplicates need a stable survivor.** `duplicateOf` points at the *first* row producing an E.164, so
+de-duplicating is a filter and the winner is the earliest row rather than whichever one a hash map
+happened to keep.
+
+The cost is memory: `audit()` is O(n). `each()` gives that back as a generator, at the price of the
+report — which is the honest trade rather than a hidden one.
+
+## Why the HTTP API is off by default
+
+A package that publishes endpoints by being installed changes an application's attack surface as a
+side effect of `composer require`, and the person who notices is rarely the person who ran it. So
+`ApiRoutes::register()` returns immediately unless config says otherwise, and it lives outside the
+service provider so that the decision is readable on its own.
+
+Two smaller choices follow from the same reasoning:
+
+- **The throttle is appended, not prepended.** Authentication runs first, so rejecting an
+  unauthenticated request does not consume its rate-limit budget — otherwise an anonymous caller can
+  exhaust the bucket for everyone sharing the limiter's key.
+- **The batch cap is enforced with a 422, never a truncation.** A caller that sent 5,000 and got
+  1,000 back has a bug it cannot see.
+
+There is no `FormRequest` anywhere in it. That class lives in `illuminate/foundation`, which is not
+published as a standalone Composer package, so using it would mean requiring `laravel/framework` in
+full from a package that otherwise needs seven Illuminate components. `Validator::make()` throws the
+same exception and Laravel renders the same body.
+
 ## What this package is not
 
 - **Not an SMS or OTP library.** It parses and formats; it does not send.
 - **Not a porting-accurate carrier lookup.** Carrier data is registration-based, so a ported number
   reports the network it was issued on. Documented, not fixed — it cannot be fixed from metadata.
 - **Not a validator.** See [Validation](validation.md).
+- **Not a queue.** `audit()` is synchronous. Auditing a million rows belongs in a job you own, built
+  on `each()`.
 
 ---
 

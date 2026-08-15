@@ -176,6 +176,12 @@ Everything above, plus `carrier()`, `description()`, `timezones()`, `telLink()`,
 `isEmpty()`, `toArray()` and `jsonSerialize()` — each forwarding to the same method on
 [`PhoneNumberValue`](value-objects.md), which is what `value()` returns.
 
+## More than one
+
+The builder answers questions about one number. For a list — a CSV column, an import, a table you
+inherited — [`Phone::audit()`](batch.md) makes one pass and answers both what each row is and what is
+wrong with the list, parsing each distinct input only once.
+
 ---
 
 [← Docs index](../../README.md#documentation)

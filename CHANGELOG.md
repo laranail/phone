@@ -7,7 +7,38 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `Phone::audit()` — judges a whole list in one pass, and answers two questions from it: what each
+  row is, and what is wrong with the list. The second is the one worth having. "53 invalid" sends an
+  operator through 53 rows; `reasons()` saying "49 too short" tells them the column was truncated on
+  export, and one fix clears all of them.
+- `Phone::each()`, the same pass streamed, for a file larger than memory. Duplicate detection
+  survives it — that needs only the first index seen per E.164 — and the report does not.
+- `Phone::e164List()`, the shortest useful thing to do with a column of whatever people typed.
+- Duplicates are detected on **E.164, not on the string**, so `0712 123456`, `+254 712 123456` and
+  `254712123456` are one number. `duplicateOf` points at the first row that produced it, so
+  de-duplicating is a filter and the survivor is deterministically the earliest row.
+- An opt-in HTTP API: `analyze`, `batch`, `audit`, `scan` and `countries`. **Off by default** — a
+  package that publishes endpoints by being installed changes an application's attack surface as a
+  side effect of `composer require`. When enabled it is throttled automatically, the throttle is
+  appended *after* your authentication so a rejected request does not spend its rate-limit budget,
+  and an over-sized batch is a 422 rather than a silent truncation.
+- `PossibilityReason::NotANumber`, for a string the parser refused outright.
+
 ### Changed
+
+- **A parse failure now reports why.** `PhoneNumberValue::possibility()` had nothing to go on once
+  libphonenumber had thrown, and guessed `INVALID_COUNTRY_CODE` for everything — so an audit of a
+  truncated CSV column reported a column of unknown calling codes, which sends an operator looking in
+  exactly the wrong place. The exception's error type is now recorded on the value object and
+  preferred.
+- PHPStan raised from level 8 to `max`, matching `laranail/email`. That surfaced two real cases: the
+  Eloquent casts turned a non-string column value into a string with `(string)`, so an array in a
+  phone column became the value object `"Array"` instead of null, and the service provider read
+  `config()` values that a wrong `.env` entry could make any type at all.
+- `config/phone.php` — the `masks` block had been separated from its own documentation by a later
+  insertion, so the file read as if `scanning` were the mask configuration.
 
 - `laranail/atlas` moved from `require` to `require-dev`. It was a hard dependency used nowhere in
   `src/` — this package deals in ISO 3166-1 alpha-2 codes and never resolves a country *name* — so it

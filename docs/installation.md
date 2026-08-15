@@ -29,14 +29,25 @@ The service provider and the `Phone` facade are auto-discovered.
 
 ## Publishing the config
 
-Only if you want to change the default country, the intel locale, or the mask cache store:
+Only if you want to change the default country, the intel locale, the mask cache store, or to turn on
+the HTTP API:
 
 ```bash
 php artisan vendor:publish --tag=laranail::phone-config
 ```
 
-This writes `config/laranail/phone.php`. Everything resolves under the vendor-namespaced key
-`config('laranail.phone.*')` — see [Configuration](configuration.md).
+This writes `config/laranail/phone.php` — a nested path, which matters: Laravel keys config by
+filename, so a flat file would load under a different key and the package would never read it. The
+published file is merged back over the packaged defaults at boot, so a partially-edited copy still
+inherits everything it does not mention.
+
+Everything resolves under the vendor-namespaced key `config('laranail.phone.*')` — see
+[Configuration](configuration.md).
+
+## The HTTP API is off
+
+Installing this package adds **no routes**. If you want the analyse / batch / audit / scan endpoints,
+enable them deliberately and authenticate them — see [HTTP API](tools/api.md).
 
 ## What comes with it
 

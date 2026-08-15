@@ -62,6 +62,11 @@ return [
     // | returns null and the field runs unmasked. Setting `ttl` to null caches
     // | forever, which is correct: the answer only changes when libphonenumber
     // | itself is upgraded.
+    'masks' => [
+        'cache_store' => env('PHONE_MASK_CACHE_STORE'),
+        'ttl' => null,
+    ],
+
     // |----------------------------------------------------------------------
     // | Scanning free text
     // |----------------------------------------------------------------------
@@ -97,9 +102,44 @@ return [
         'from' => env('PHONE_DIAL_FROM'),
     ],
 
-    'masks' => [
-        'cache_store' => env('PHONE_MASK_CACHE_STORE'),
-        'ttl' => null,
+    // |----------------------------------------------------------------------
+    // | HTTP API
+    // |----------------------------------------------------------------------
+    // | Analyse, batch, audit and scan over HTTP, for the callers that are not
+    // | PHP: a Node service, a data pipeline, an internal admin tool.
+    // |
+    // | OFF BY DEFAULT, and turning it on is the whole security decision.
+    // |
+    // | > `middleware` below is NOT authentication. `api` is Laravel's stock
+    // | > group — throttling and route-model binding — and adding these routes
+    // | > with it alone publishes an endpoint that will parse anything anyone
+    // | > sends it. Put `auth:sanctum`, a token middleware, or an IP allow-list
+    // | > in this list before enabling it on anything reachable.
+    // |
+    // | A `throttle` is appended automatically unless the middleware list
+    // | already contains one, so removing the rate limit also takes an explicit
+    // | act. Set `throttle` to null to opt out.
+    'api' => [
+        'enabled' => env('PHONE_API_ENABLED', false),
+
+        // Mounted under this URI prefix, and route names are derived from it.
+        'prefix' => env('PHONE_API_PREFIX', 'api/laranail/phone'),
+
+        // Read the warning above before changing this.
+        'middleware' => ['api'],
+
+        // Laravel's `throttle:{maxAttempts},{decayMinutes}` argument, or null.
+        'throttle' => env('PHONE_API_THROTTLE', '60,1'),
+
+        // The most values one batch or audit request may carry. Exceeding it is
+        // a 422 naming the field — never a silent truncation, because a caller
+        // that sent 5,000 and got 1,000 back has a bug it cannot see.
+        'max_batch' => (int) env('PHONE_API_MAX_BATCH', 1000),
+
+        // Whether carrier, geographic description and timezone may be requested.
+        // Each loads its own prefix-keyed metadata, so a thousand-number batch
+        // with intel on is a different cost class from one without.
+        'allow_intel' => env('PHONE_API_ALLOW_INTEL', true),
     ],
 
 ];

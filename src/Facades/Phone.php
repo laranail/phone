@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Facades;
 
+use Generator;
 use Illuminate\Support\Facades\Facade;
 use Simtabi\Laranail\Phone\Enums\MatchLeniency;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\PhoneBatch;
 use Simtabi\Laranail\Phone\PhoneBuilder;
 use Simtabi\Laranail\Phone\PhoneCatalogue;
 use Simtabi\Laranail\Phone\PhoneDialler;
@@ -15,6 +17,8 @@ use Simtabi\Laranail\Phone\PhoneManager;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
 use Simtabi\Laranail\Phone\PhoneScanner;
 use Simtabi\Laranail\Phone\ShortNumbers;
+use Simtabi\Laranail\Phone\Support\PhoneAudit;
+use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
 use Simtabi\Laranail\Phone\Support\PhoneMatch;
 
 /**
@@ -38,6 +42,10 @@ use Simtabi\Laranail\Phone\Support\PhoneMatch;
  * @method static PhoneNumberValue|null example(string $country, PhoneNumberType $type = PhoneNumberType::Mobile)
  * @method static int|null callingCodeFor(string $country)
  * @method static PhoneBuilder of(?string $input)
+ * @method static PhoneAudit audit(iterable<mixed, string|null> $inputs, ?string $country = null)
+ * @method static Generator<int, PhoneAuditEntry> each(iterable<mixed, string|null> $inputs, ?string $country = null)
+ * @method static list<string> e164List(iterable<mixed, string|null> $inputs, ?string $country = null, bool $validOnly = true)
+ * @method static PhoneBatch batch()
  * @method static list<PhoneMatch> find(?string $text, ?string $country = null, ?MatchLeniency $leniency = null)
  * @method static string|null replaceIn(?string $text, callable $replace, ?string $country = null)
  * @method static string|null redact(?string $text, ?string $country = null, string $maskChar = '•')

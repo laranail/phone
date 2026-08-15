@@ -10,6 +10,7 @@ use libphonenumber\PhoneNumberUtil;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
 use Throwable;
 
 /**
@@ -57,10 +58,15 @@ final readonly class PhoneFormatter
         }
 
         $region = $this->resolveRegion($normalized, $country);
-        $parsed = $this->attemptParse($normalized, $region);
+        $failure = null;
+        $parsed = $this->attemptParse($normalized, $region, $failure);
 
         if (! $parsed instanceof LibPhoneNumber) {
-            return new PhoneNumberValue(raw: $normalized, intel: $this->intel);
+            return new PhoneNumberValue(
+                raw: $normalized,
+                intel: $this->intel,
+                failure: $failure === null ? null : PossibilityReason::fromParseException($failure),
+            );
         }
 
         return $this->hydrate($normalized, $parsed);
@@ -152,7 +158,7 @@ final readonly class PhoneFormatter
      * off but can still make sense of. It matters most for freshly allocated ranges, which are
      * parseable long before Google's metadata catches up.
      */
-    private function attemptParse(string $value, ?string $region): ?LibPhoneNumber
+    private function attemptParse(string $value, ?string $region, ?NumberParseException &$failure = null): ?LibPhoneNumber
     {
         try {
             return $this->util->parse($value, $region);
@@ -162,7 +168,12 @@ final readonly class PhoneFormatter
 
         try {
             return $this->util->parse($value, $region, null, true);
-        } catch (NumberParseException) {
+        } catch (NumberParseException $exception) {
+            // Kept, not swallowed. It carries the only account of *why* the string is not a number,
+            // and the value object has nowhere else to get one from — an unparseable input leaves no
+            // parsed object to interrogate afterwards.
+            $failure = $exception;
+
             return null;
         }
     }

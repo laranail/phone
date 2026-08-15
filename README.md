@@ -5,7 +5,7 @@
 [![Static analysis](https://github.com/laranail/phone/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/laranail/phone/actions/workflows/static-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Phone numbers for Laravel — an immutable value object over libphonenumber, input normalisation that handles what people actually paste, per-country input masks, Eloquent casts and a test-number factory.
+> Phone numbers for Laravel — a fluent API over libphonenumber, from one number to a whole list: parsing, normalisation, validity with a reason, free-text scanning, per-country masks, Eloquent casts, batch auditing and an opt-in HTTP API.
 
 Requires PHP `^8.4.1` on Laravel `^13`.
 
@@ -33,7 +33,7 @@ Full documentation is at
 
 - [Installation](docs/installation.md) — Composer install, supported versions, the two optional extensions
 - [Getting started](docs/getting-started.md) — parse, store and display a number, end to end
-- [Configuration](docs/configuration.md) — five settings, all safe to leave alone
+- [Configuration](docs/configuration.md) — six blocks, all safe to leave alone except the API
 - [Formats](docs/formats.md) — the four formats, and why only one belongs in a column
 - [Countries](docs/countries.md) — how a country is resolved, and why `+1` is not a country
 - [Validation](docs/validation.md) — why the rules live in `laranail/validation`, and the seam
@@ -43,6 +43,8 @@ Full documentation is at
 ### Reference
 
 - [Fluent builder](docs/tools/fluent-builder.md) — `Phone::of(...)`, and why narrowing returns a new instance
+- [Batch and audit](docs/tools/batch.md) — judging a whole list, and why that is two questions
+- [HTTP API](docs/tools/api.md) — five endpoints, off by default, and how to turn them on safely
 - [Scanner](docs/tools/scanner.md) — finding numbers in free text, and why it is not a regex
 - [Dialling](docs/tools/dialling.md) — the digits to actually dial, which are not the ones you stored
 - [Short numbers](docs/tools/short-numbers.md) — `999`, `112`, and what a short code costs to dial
@@ -64,6 +66,8 @@ Full documentation is at
 - [Localise country names](docs/recipes/localise-country-names.md) — three catalogues, and why none ships here
 - [Find numbers in text](docs/recipes/find-numbers-in-text.md) — link or redact numbers inside prose
 - [Deduplicate contacts](docs/recipes/deduplicate-contacts.md) — merge rows holding one number written four ways
+- [Audit a contact import](docs/recipes/audit-a-contact-import.md) — judge a CSV before it reaches the database
+- [Expose the HTTP API](docs/recipes/expose-the-http-api.md) — enable the endpoints, and authenticate them first
 
 ### Project
 

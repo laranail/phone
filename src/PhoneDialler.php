@@ -126,7 +126,7 @@ final readonly class PhoneDialler
         }
 
         try {
-            return $this->util->parse($value->e164, null);
+            return $this->util->parse($value->e164);
         } catch (NumberParseException) {
             return null;
         }

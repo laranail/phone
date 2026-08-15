@@ -47,6 +47,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
      * @param string|null $country ISO 3166-1 alpha-2, or null when it could not be resolved
      * @param string|null $extension Digits only, without any `ext` marker
      * @param int|null $callingCode The country calling code as an integer, e.g. `254`
+     * @param PossibilityReason|null $failure Why the parse threw, when it did
      */
     public function __construct(
         public string $raw,
@@ -61,6 +62,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
         public bool $isValid = false,
         public bool $isPossible = false,
         private ?ResolvesPhoneIntel $intel = null,
+        public ?PossibilityReason $failure = null,
     ) {}
 
     /** An empty value, for a null or blank input. */
@@ -78,10 +80,18 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
      */
     public function possibility(): PossibilityReason
     {
+        // The recorded parse failure wins where there is one: it is the only thing that knows *why*
+        // the string never became a number, and re-deriving from an object that does not exist can
+        // only guess. An earlier version guessed `INVALID_COUNTRY_CODE` for everything here, which
+        // reported a column of truncated numbers as a column of unknown calling codes.
+        if ($this->failure !== null) {
+            return $this->failure;
+        }
+
         $parsed = $this->parsed();
 
         if (! $parsed instanceof LibPhoneNumber) {
-            return PossibilityReason::InvalidCountryCode;
+            return PossibilityReason::NotANumber;
         }
 
         return PossibilityReason::fromLibPhoneNumber(
@@ -367,7 +377,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
         }
 
         try {
-            return PhoneNumberUtil::getInstance()->parse($this->e164, null);
+            return PhoneNumberUtil::getInstance()->parse($this->e164);
         } catch (NumberParseException) {
             return null;
         }

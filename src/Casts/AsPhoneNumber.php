@@ -71,7 +71,14 @@ final class AsPhoneNumber implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): ?PhoneNumberValue
     {
-        if ($value === null || $value === '') {
+        // A column holding something other than a string is not a phone number that needs casting —
+        // it is a schema mistake, and turning an array into `"Array"` would hide it behind a value
+        // object that looks parsed.
+        if (! is_string($value) && ! is_int($value)) {
+            return null;
+        }
+
+        if ($value === '') {
             return null;
         }
 
