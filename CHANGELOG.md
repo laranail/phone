@@ -22,6 +22,28 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `Phone::of()` — a fluent builder. Narrow with `country()`/`from()`/`type()`, then ask: `isValid()`,
+  `why()`, `masked()`, `dialFrom()`, `areaCode()`, `matches()`. Immutable, and the parse is memoised
+  so twenty questions about one number cost one parse.
+- `PhoneScanner` — `find()`, `replaceIn()` and `redact()` over free text, wrapping libphonenumber's
+  `PhoneNumberMatcher`. Four leniency levels via `MatchLeniency`; `replaceIn()` walks matches in
+  reverse so earlier offsets stay valid.
+- `PhoneDialler` — `dialFrom()` and `forMobile()`, wrapping `formatOutOfCountryCallingNumber()` and
+  `formatNumberForMobileDialing()`. What a caller in one country actually dials to reach a number in
+  another, IDD prefix and all — not the same string as the international format.
+- `ShortNumbers` — emergency and short-code questions via `ShortNumberInfo`: `connectsToEmergency()`,
+  `isEmergency()`, `cost()`, `isCarrierSpecific()`, `acceptsSms()`. These need a region and say so
+  rather than guessing one.
+- `PhoneCatalogue` — the numbering plan itself: `regionsForCallingCode()` (so `+1` is a set, not
+  `US`), `primaryRegionForCallingCode()`, `callingCodeFor()`, `isNanp()`, `typesFor()`,
+  `isPortable()`, `nationalPrefix()`.
+- `PossibilityReason`, `MatchStrength`, `MatchLeniency` and `ShortNumberCost` — string-backed enums
+  over libphonenumber's `ValidationResult`, `MatchType`, `Leniency` and `ShortNumberCost`, with the
+  question each answers named on it (`isCorrectable()`, `isSame()`, `isChargeable()`).
+- `PhoneNumberValue::masked()`, `maskedByPercent()`, `possibility()`, `matches()`, `areaCode()`,
+  `nationalDestinationCode()`, `isGeographic()` and `isVanity()`.
+- Configuration for the new surfaces: `scanning.leniency`, `scanning.limit` and `dialling.from`.
+
 - `PhoneNumberValue` — an immutable value object carrying every rendering of a number (`e164`,
   `national`, `international`, `rfc3966`), its country, extension, type, validity, carrier, region
   and timezones.

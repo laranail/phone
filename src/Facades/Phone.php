@@ -5,13 +5,20 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Simtabi\Laranail\Phone\Enums\MatchLeniency;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\PhoneFormatter;
+use Simtabi\Laranail\Phone\PhoneBuilder;
+use Simtabi\Laranail\Phone\PhoneCatalogue;
+use Simtabi\Laranail\Phone\PhoneDialler;
+use Simtabi\Laranail\Phone\PhoneManager;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
+use Simtabi\Laranail\Phone\PhoneScanner;
+use Simtabi\Laranail\Phone\ShortNumbers;
+use Simtabi\Laranail\Phone\Support\PhoneMatch;
 
 /**
- * The package's entry point, over {@see PhoneFormatter}.
+ * The package's entry point, over {@see PhoneManager}.
  *
  * Deliberately **not** registered as a global alias. `Phone` is exactly the kind of short, plausible
  * name an application or another package would also claim, and Laravel's alias map is flat — the
@@ -22,6 +29,7 @@ use Simtabi\Laranail\Phone\PhoneNumberValue;
  * use Simtabi\Laranail\Phone\Facades\Phone;
  *
  * Phone::parse('0712 345678', 'KE')->e164;   // '+254712345678'
+ * Phone::of('0712 345678')->country('KE')->e164();
  * ```
  *
  * @method static PhoneNumberValue parse(?string $input, ?string $country = null)
@@ -29,13 +37,21 @@ use Simtabi\Laranail\Phone\PhoneNumberValue;
  * @method static string|null toE164(?string $input, ?string $country = null)
  * @method static PhoneNumberValue|null example(string $country, PhoneNumberType $type = PhoneNumberType::Mobile)
  * @method static int|null callingCodeFor(string $country)
+ * @method static PhoneBuilder of(?string $input)
+ * @method static list<PhoneMatch> find(?string $text, ?string $country = null, ?MatchLeniency $leniency = null)
+ * @method static string|null replaceIn(?string $text, callable $replace, ?string $country = null)
+ * @method static string|null redact(?string $text, ?string $country = null, string $maskChar = '•')
+ * @method static PhoneDialler dialler()
+ * @method static PhoneScanner scanner()
+ * @method static PhoneCatalogue catalogue()
+ * @method static ShortNumbers shortNumbers()
  *
- * @see PhoneFormatter
+ * @see PhoneManager
  */
 final class Phone extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return PhoneFormatter::class;
+        return PhoneManager::class;
     }
 }

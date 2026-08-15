@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use JsonSerializable;
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumber as LibPhoneNumber;
+use libphonenumber\PhoneNumberUtil;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
+use Simtabi\Laranail\Phone\Enums\MatchStrength;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
 use Stringable;
 
 /**
@@ -64,6 +69,104 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
         return new self(raw: $raw);
     }
 
+    /**
+     * Why the number is not usable, rather than merely that it is not.
+     *
+     * `isPossible` is a boolean and a boolean cannot be acted on. "Too short" tells a user to keep
+     * typing; "unknown calling code" tells them they pasted the wrong thing. See
+     * {@see PossibilityReason::isCorrectable()}.
+     */
+    public function possibility(): PossibilityReason
+    {
+        $parsed = $this->parsed();
+
+        if (! $parsed instanceof LibPhoneNumber) {
+            return PossibilityReason::InvalidCountryCode;
+        }
+
+        return PossibilityReason::fromLibPhoneNumber(
+            PhoneNumberUtil::getInstance()->isPossibleNumberWithReason($parsed),
+        );
+    }
+
+    /**
+     * How closely this matches another number.
+     *
+     * Graded rather than boolean, because the honest answer depends on how much country context each
+     * side carries — see {@see MatchStrength}. Use `->matches($other)->isSame()` for a yes or no.
+     */
+    public function matches(self|string|null $other): MatchStrength
+    {
+        if ($other === null) {
+            return MatchStrength::NotANumber;
+        }
+
+        $util = PhoneNumberUtil::getInstance();
+        $mine = $this->e164 ?? $this->raw;
+        $theirs = $other instanceof self ? ($other->e164 ?? $other->raw) : $other;
+
+        if ($mine === '' || $theirs === '') {
+            return MatchStrength::NotANumber;
+        }
+
+        return MatchStrength::fromLibPhoneNumber($util->isNumberMatch($mine, $theirs));
+    }
+
+    /**
+     * The geographic area code, where the plan has one.
+     *
+     * Null rather than an empty string for a number with no area code — mobiles in most of Europe,
+     * and every number in a plan that does not allocate geographically. Distinguishing "no area
+     * code" from "area code unknown" matters when the value is being stored.
+     */
+    public function areaCode(): ?string
+    {
+        $parsed = $this->parsed();
+
+        if (! $parsed instanceof LibPhoneNumber) {
+            return null;
+        }
+
+        $util = PhoneNumberUtil::getInstance();
+        $length = $util->getLengthOfGeographicalAreaCode($parsed);
+
+        return $length === 0 ? null : substr($util->getNationalSignificantNumber($parsed), 0, $length);
+    }
+
+    /**
+     * The national destination code — the operator or region prefix inside the national number.
+     *
+     * Wider than {@see areaCode()}: it is present for mobile ranges too, where it identifies the
+     * network rather than a place. This is the part that stays constant across a carrier's block.
+     */
+    public function nationalDestinationCode(): ?string
+    {
+        $parsed = $this->parsed();
+
+        if (! $parsed instanceof LibPhoneNumber) {
+            return null;
+        }
+
+        $util = PhoneNumberUtil::getInstance();
+        $length = $util->getLengthOfNationalDestinationCode($parsed);
+
+        return $length === 0 ? null : substr($util->getNationalSignificantNumber($parsed), 0, $length);
+    }
+
+    /** Whether the number is tied to a place at all, rather than being mobile or non-geographic. */
+    public function isGeographic(): bool
+    {
+        $parsed = $this->parsed();
+
+        return $parsed instanceof LibPhoneNumber && PhoneNumberUtil::getInstance()->isNumberGeographical($parsed);
+    }
+
+    /** Whether the input used letters, as vanity numbers do. */
+    public function isVanity(): bool
+    {
+        return $this->raw !== '' && PhoneNumberUtil::getInstance()->isAlphaNumber($this->raw);
+    }
+
     /** Whether there is a usable number here at all. */
     public function isEmpty(): bool
     {
@@ -111,7 +214,15 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
      * Keeps the calling code and the last two digits, which is enough for a human to confirm they are
      * looking at the right record and not enough to dial it.
      */
-    public function masked(string $maskChar = '•'): string
+    /**
+     * Obscure the number, keeping the calling code and the last digits.
+     *
+     * The default hides everything between, which is the right shape for a support queue or an audit
+     * log: enough to recognise a number you already know, not enough to dial one you do not.
+     *
+     * @param int|null $keep How many trailing digits to leave visible. Null keeps two.
+     */
+    public function masked(string $maskChar = '•', ?int $keep = null): string
     {
         if ($this->e164 === null) {
             return $this->raw === '' ? '' : str_repeat($maskChar, mb_strlen($this->raw));
@@ -119,12 +230,38 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
 
         $prefix = '+' . ($this->callingCode ?? '');
         $rest = substr($this->e164, strlen($prefix));
+        $keep = max(0, $keep ?? 2);
 
-        if (strlen($rest) <= 2) {
+        if (strlen($rest) <= $keep) {
             return $this->e164;
         }
 
-        return $prefix . str_repeat($maskChar, strlen($rest) - 2) . substr($rest, -2);
+        return $prefix . str_repeat($maskChar, strlen($rest) - $keep) . ($keep === 0 ? '' : substr($rest, -$keep));
+    }
+
+    /**
+     * Obscure a proportion of the number rather than a fixed count.
+     *
+     * Borrowed from `simtabi/pheg`, which masks by percentile, and worth having beside the fixed
+     * form: a rule expressed as "hide most of it" travels across numbering plans where "hide all but
+     * two" does not. A nine-digit Kenyan mobile and a fifteen-digit international number masked to
+     * two visible digits leak very different proportions of themselves.
+     *
+     * @param int $percent How much of the national part to hide, 0–100
+     */
+    public function maskedByPercent(int $percent = 60, string $maskChar = '•'): string
+    {
+        if ($this->e164 === null) {
+            return $this->masked($maskChar);
+        }
+
+        $prefix = '+' . ($this->callingCode ?? '');
+        $rest = substr($this->e164, strlen($prefix));
+        $percent = max(0, min(100, $percent));
+
+        $hidden = (int) round(strlen($rest) * ($percent / 100));
+
+        return $this->masked($maskChar, max(0, strlen($rest) - $hidden));
     }
 
     /**
@@ -213,5 +350,26 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     public function __toString(): string
     {
         return $this->e164 ?? $this->raw;
+    }
+
+    /**
+     * Re-parse for the handful of reads that need libphonenumber's own object.
+     *
+     * The value object deliberately holds strings — it is serialisable, cacheable and comparable —
+     * so the few accessors that need structure re-derive it from E.164, which is lossless. Cheaper
+     * than carrying a library object through every cast and cache round trip for accessors most
+     * callers never touch.
+     */
+    private function parsed(): ?LibPhoneNumber
+    {
+        if ($this->e164 === null) {
+            return null;
+        }
+
+        try {
+            return PhoneNumberUtil::getInstance()->parse($this->e164, null);
+        } catch (NumberParseException) {
+            return null;
+        }
     }
 }

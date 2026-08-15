@@ -9,11 +9,17 @@ use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 use Simtabi\Laranail\Phone\CountryReconciler;
+use Simtabi\Laranail\Phone\Enums\MatchLeniency;
 use Simtabi\Laranail\Phone\MaskGenerator;
+use Simtabi\Laranail\Phone\PhoneCatalogue;
+use Simtabi\Laranail\Phone\PhoneDialler;
 use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Phone\PhoneIntel;
+use Simtabi\Laranail\Phone\PhoneManager;
 use Simtabi\Laranail\Phone\PhoneNormalizer;
 use Simtabi\Laranail\Phone\PhoneNumberFactory;
+use Simtabi\Laranail\Phone\PhoneScanner;
+use Simtabi\Laranail\Phone\ShortNumbers;
 
 /**
  * Wires `laranail/phone` onto the house {@see PackageServiceProvider}.
@@ -81,6 +87,32 @@ final class PhoneServiceProvider extends PackageServiceProvider
         $this->app->singleton(PhoneNumberFactory::class, fn ($app): PhoneNumberFactory => new PhoneNumberFactory(
             formatter: $app->make(PhoneFormatter::class),
             defaultCountry: (string) (config('laranail.phone.default_country') ?? 'US'),
+        ));
+
+        $this->app->singleton(PhoneDialler::class, fn ($app): PhoneDialler => new PhoneDialler(
+            formatter: $app->make(PhoneFormatter::class),
+        ));
+
+        // Stateless lookups over libphonenumber's own metadata. Singletons because the underlying
+        // metadata loading is what costs, and it is per-region and cached inside the library.
+        $this->app->singleton(PhoneCatalogue::class, fn (): PhoneCatalogue => new PhoneCatalogue);
+        $this->app->singleton(ShortNumbers::class, fn (): ShortNumbers => new ShortNumbers);
+
+        $this->app->singleton(PhoneScanner::class, fn (): PhoneScanner => new PhoneScanner(
+            defaultCountry: config('laranail.phone.default_country'),
+            leniency: MatchLeniency::tryFrom((string) config('laranail.phone.scanning.leniency', 'VALID'))
+                ?? MatchLeniency::Valid,
+            limit: (int) config('laranail.phone.scanning.limit', PHP_INT_MAX),
+        ));
+
+        // The facade's accessor. Forwards the original five methods unchanged, so the surface is a
+        // superset of what it was.
+        $this->app->singleton(PhoneManager::class, fn ($app): PhoneManager => new PhoneManager(
+            formatter: $app->make(PhoneFormatter::class),
+            dialler: $app->make(PhoneDialler::class),
+            scanner: $app->make(PhoneScanner::class),
+            catalogue: $app->make(PhoneCatalogue::class),
+            shortNumbers: $app->make(ShortNumbers::class),
         ));
     }
 

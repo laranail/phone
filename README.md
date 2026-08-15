@@ -42,6 +42,11 @@ Full documentation is at
 
 ### Reference
 
+- [Fluent builder](docs/tools/fluent-builder.md) — `Phone::of(...)`, and why narrowing returns a new instance
+- [Scanner](docs/tools/scanner.md) — finding numbers in free text, and why it is not a regex
+- [Dialling](docs/tools/dialling.md) — the digits to actually dial, which are not the ones you stored
+- [Short numbers](docs/tools/short-numbers.md) — `999`, `112`, and what a short code costs to dial
+- [Catalogue](docs/tools/catalogue.md) — regions, calling codes, and why `+1` is not a country
 - [`PhoneNumberValue`](docs/tools/value-objects.md) — thirteen properties and nine methods over one parsed number
 - [`PhoneFormatter`](docs/tools/formatter.md) — the parse entry point and its three-tier fallback
 - [`PhoneNormalizer`](docs/tools/normalizer.md) — what gets cleaned out of input before parsing
@@ -57,6 +62,8 @@ Full documentation is at
 - [Normalise a legacy column](docs/recipes/normalise-a-legacy-column.md) — backfill without destroying the rows that fail
 - [Seed test numbers](docs/recipes/seed-test-numbers.md) — why an invented number is usually invalid
 - [Localise country names](docs/recipes/localise-country-names.md) — three catalogues, and why none ships here
+- [Find numbers in text](docs/recipes/find-numbers-in-text.md) — link or redact numbers inside prose
+- [Deduplicate contacts](docs/recipes/deduplicate-contacts.md) — merge rows holding one number written four ways
 
 ### Project
 

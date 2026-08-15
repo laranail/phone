@@ -62,6 +62,41 @@ return [
     // | returns null and the field runs unmasked. Setting `ttl` to null caches
     // | forever, which is correct: the answer only changes when libphonenumber
     // | itself is upgraded.
+    // |----------------------------------------------------------------------
+    // | Scanning free text
+    // |----------------------------------------------------------------------
+    // | Defaults for `Phone::find()`, which locates numbers inside prose rather
+    // | than parsing a field.
+    // |
+    // | `leniency` is the trade between missing numbers and inventing them, and
+    // | the right point depends entirely on the text. VALID is the sensible
+    // | default: it requires a candidate to be a real number for some region, so
+    // | an invoice reference is not mistaken for a phone number. POSSIBLE finds
+    // | more and is right for a support inbox; EXACT_GROUPING finds fewer and is
+    // | right for redacting a document, where a false positive destroys data.
+    // |
+    // | One of: POSSIBLE, VALID, STRICT_GROUPING, EXACT_GROUPING.
+    'scanning' => [
+        'leniency' => env('PHONE_SCAN_LENIENCY', 'VALID'),
+
+        // A ceiling on matches per scan. Guards against a pathological input
+        // producing an unbounded result set; PHP_INT_MAX means no ceiling.
+        'limit' => (int) env('PHONE_SCAN_LIMIT', PHP_INT_MAX),
+    ],
+
+    // |----------------------------------------------------------------------
+    // | Dialling
+    // |----------------------------------------------------------------------
+    // | The country calls are assumed to originate from, for `dialFrom()` and
+    // | `forMobile()` when no explicit origin is given.
+    // |
+    // | E.164 is what you store; it is not always what you dial. Calling a UK
+    // | number from Kenya is `000 44 ...`, from the United States `011 44 ...`,
+    // | and from inside the UK `020 ...` — one stored value, three strings.
+    'dialling' => [
+        'from' => env('PHONE_DIAL_FROM'),
+    ],
+
     'masks' => [
         'cache_store' => env('PHONE_MASK_CACHE_STORE'),
         'ttl' => null,
