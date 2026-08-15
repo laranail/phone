@@ -9,6 +9,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `Phone::report()` — the verdict on a list of any size, without holding it. `audit()` keeps every
+  entry at O(n) and `each()` keeps nothing and gives up the report; this keeps only the tallies and a
+  bounded sample of row indexes, so a database column is auditable without a job at all. The two
+  paths share one definition of the report, so they cannot drift into disagreeing about what a
+  summary means.
+- `AuditPhoneColumn`, a queued job that audits a whole table column in chunks and caches the report
+  and its progress. It takes a model class rather than the rows because a queue payload has to
+  serialise and a generator does not, and it reads the column with `lazyById()` as one sequence —
+  auditing chunk by chunk and merging afterwards would restart row indexes per chunk and report rows
+  as duplicates of each other that are nothing of the kind.
+- `PhoneAuditReport::duplicateCounts()`, exact where `duplicateGroups()` is a capped sample.
 - `Phone::audit()` — judges a whole list in one pass, and answers two questions from it: what each
   row is, and what is wrong with the list. The second is the one worth having. "53 invalid" sends an
   operator through 53 rows; `reasons()` saying "49 too short" tells them the column was truncated on
@@ -37,6 +48,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Eloquent casts turned a non-string column value into a string with `(string)`, so an array in a
   phone column became the value object `"Array"` instead of null, and the service provider read
   `config()` values that a wrong `.env` entry could make any type at all.
+- The `Without ext-intl` CI leg had never removed the extension. Leaving it off setup-php's list is a
+  no-op — the runner's PHP ships with intl enabled — so the job ran identically to the four matrix
+  legs while claiming to prove the fallback. Its own assertion caught this and turned the workflow
+  red, which is the assertion working. The comment above it was also describing a design the package
+  no longer has: it deals in ISO codes and never resolves a country name, so what the leg is worth
+  keeping for is the claim that ext-intl is a *suggest* rather than a requirement.
 - `config/phone.php` — the `masks` block had been separated from its own documentation by a later
   insertion, so the file read as if `scanning` were the mask configuration.
 

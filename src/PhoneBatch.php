@@ -7,6 +7,7 @@ namespace Simtabi\Laranail\Phone;
 use Generator;
 use Simtabi\Laranail\Phone\Support\PhoneAudit;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
+use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
 use Stringable;
 
 /**
@@ -94,6 +95,31 @@ final readonly class PhoneBatch
 
             $index++;
         }
+    }
+
+    /**
+     * The report, without holding the entries.
+     *
+     * The third option, and usually the right one for anything large: `audit()` holds every entry at
+     * O(n), `each()` holds nothing and gives up the report, and this holds only the tallies and the
+     * first index per number — **O(distinct)**. A million rows over a few thousand distinct numbers
+     * costs the thousands.
+     *
+     * What is given up compared to `audit()` is per-row access: you get the verdict on the list and
+     * cannot afterwards ask which rows to keep. Use `each()` alongside it if you need both, or the
+     * duplicate groups, which carry the indexes.
+     *
+     * @param iterable<mixed, string|null> $inputs
+     */
+    public function report(iterable $inputs, ?string $country = null): PhoneAuditReport
+    {
+        $report = new PhoneAuditReport;
+
+        foreach ($this->each($inputs, $country) as $entry) {
+            $report->add($entry);
+        }
+
+        return $report;
     }
 
     /**

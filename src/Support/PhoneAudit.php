@@ -199,17 +199,23 @@ final readonly class PhoneAudit implements Countable, IteratorAggregate, JsonSer
     }
 
     /**
+     * The fixed-size verdict.
+     *
+     * Delegates to {@see PhoneAuditReport} rather than computing its own, so this path and the
+     * streaming one cannot drift into disagreeing about what a summary means — the kind of
+     * divergence nobody notices until two dashboards built on the same data show different numbers.
+     *
      * @return array{summary: array<string, int>, countries: array<string, int>, types: array<string, int>, reasons: array<string, int>, duplicates: array<string, list<int>>}
      */
     public function report(): array
     {
-        return [
-            'summary' => $this->summary(),
-            'countries' => $this->countries(),
-            'types' => $this->types(),
-            'reasons' => $this->reasons(),
-            'duplicates' => $this->duplicateGroups(),
-        ];
+        $report = new PhoneAuditReport;
+
+        foreach ($this->entries as $entry) {
+            $report->add($entry);
+        }
+
+        return $report->toArray();
     }
 
     /**

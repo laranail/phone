@@ -43,7 +43,7 @@ Full documentation is at
 ### Reference
 
 - [Fluent builder](docs/tools/fluent-builder.md) — `Phone::of(...)`, and why narrowing returns a new instance
-- [Batch and audit](docs/tools/batch.md) — judging a whole list, and why that is two questions
+- [Batch and audit](docs/tools/batch.md) — judging a whole list, streaming a million rows, and the queued job
 - [HTTP API](docs/tools/api.md) — five endpoints, off by default, and how to turn them on safely
 - [Scanner](docs/tools/scanner.md) — finding numbers in free text, and why it is not a regex
 - [Dialling](docs/tools/dialling.md) — the digits to actually dial, which are not the ones you stored
@@ -67,6 +67,7 @@ Full documentation is at
 - [Find numbers in text](docs/recipes/find-numbers-in-text.md) — link or redact numbers inside prose
 - [Deduplicate contacts](docs/recipes/deduplicate-contacts.md) — merge rows holding one number written four ways
 - [Audit a contact import](docs/recipes/audit-a-contact-import.md) — judge a CSV before it reaches the database
+- [Audit a table in the background](docs/recipes/audit-a-table-in-the-background.md) — a million rows on the queue
 - [Expose the HTTP API](docs/recipes/expose-the-http-api.md) — enable the endpoints, and authenticate them first
 
 ### Project

@@ -18,7 +18,8 @@ arrives as a list: a CSV column, a contacts import, a marketing list someone is 
 users table nobody has looked at in three years.
 
 In this section: [Two questions](#two-questions-not-one) · [Entries](#entries) ·
-[The report](#the-report) · [Streaming](#streaming-a-list-larger-than-memory) ·
+[The report](#the-report) · [Three sizes of problem](#three-sizes-of-problem) ·
+[On the queue](#auditing-a-table-on-the-queue) · [Streaming](#streaming-a-list-larger-than-memory) ·
 [Cost](#what-it-costs) · [Method reference](#method-reference)
 
 ## Two questions, not one
@@ -86,6 +87,77 @@ time. "49 too short" tells them the column was truncated on export, and they fix
 > outright now comes back as `NOT_A_NUMBER` rather than being guessed at as `INVALID_COUNTRY_CODE`.
 > See [`PhoneNumberValue`](value-objects.md).
 
+## Three sizes of problem
+
+| | Holds | Gives you |
+|---|---|---|
+| `Phone::audit()` | every entry, O(n) | the report **and** per-row filtering |
+| `Phone::report()` | tallies only, bounded | the report |
+| `Phone::each()` | nothing | one entry at a time, no report |
+
+`report()` is the one to reach for when the input is a database column or a file rather than a form
+submission. It is the same verdict `audit()` produces — the two share one definition, so they cannot
+drift — computed without keeping the rows:
+
+```php
+$report = Phone::report($millionRowIterator, 'KE');
+
+$report->summary();          // ['total' => 1_000_000, 'valid' => 987_412, …]
+$report->reasons();          // ['TOO_SHORT' => 9_884, …]
+$report->duplicateCounts();  // ['+254712123456' => 412, …]
+```
+
+What it gives up against `audit()` is per-row access: you get the verdict on the list and cannot
+afterwards ask which rows to keep. The duplicate groups still carry row indexes, so you can go and
+look.
+
+> **The duplicate row indexes are a sample, capped at 100 per number.** The counts are exact and
+> always will be; what is bounded is how many example rows you can be pointed at. That cap is what
+> makes the memory claim true — an earlier version kept every index, which is O(rows) wearing an
+> O(distinct) description, and cost 1.2 MB for ten thousand rows over three numbers.
+
+Two reports can be folded together with `merge()`, for chunks audited on separate workers. It
+recounts duplicates rather than adding them, because a number seen in two chunks is a duplicate that
+neither chunk knew about.
+
+## Auditing a table on the queue
+
+```php
+use Simtabi\Laranail\Phone\Jobs\AuditPhoneColumn;
+
+AuditPhoneColumn::dispatch(User::class, 'phone', country: 'KE', key: 'users');
+
+// …later
+Cache::get('laranail.phone.audit.users');            // the report
+Cache::get('laranail.phone.audit.users.progress');   // rows read so far
+```
+
+| Argument | | |
+|---|---|---|
+| `model` | required | An Eloquent model class |
+| `column` | required | The column holding the numbers |
+| `country` | `null` | Region for bare national values |
+| `key` | `'default'` | Cache key suffix |
+| `chunk` | `1000` | Rows per query |
+| `scope` | `null` | A named query scope, applied without arguments |
+| `ttl` | `86400` | Seconds to keep the report; `null` keeps it until evicted |
+
+**It takes a model class rather than the rows**, because a queue payload has to serialise and a
+generator does not — nor does a closure, a cursor or a file handle. Passing the rows in would mean
+serialising a million values into the payload before a worker saw one, which is the problem the job
+exists to solve.
+
+The column is read with `lazyById()`, so it reaches the report as **one** sequence. Auditing chunk by
+chunk and merging afterwards would restart the row indexes at zero per chunk, and the duplicate
+groups would then report rows as duplicates of each other that are nothing of the kind.
+
+> Keyset paging rather than `offset`, because an audit whose caller is also writing to the table it
+> reads shifts rows underneath an offset-paged query and silently skips some.
+
+A scope that does not return a builder throws rather than being ignored: silently dropping it would
+audit the whole table while appearing to audit a subset, which is the worst kind of wrong because the
+report still looks plausible.
+
 ## Streaming a list larger than memory
 
 `audit()` holds every entry. `each()` yields them and accumulates nothing:
@@ -98,9 +170,9 @@ foreach (Phone::each($millionRowIterator, 'KE') as $entry) {
 }
 ```
 
-Duplicate detection survives — it needs only the first index seen per E.164, which is O(distinct)
-rather than O(n). What is given up is the report: nothing can tell you the totals until the generator
-is exhausted, and by then the entries are gone.
+Duplicate detection survives — it needs only the first index seen per E.164. What is given up is the
+report, which is what `report()` above exists to give back: use `each()` when you want to *act* on
+each row as it goes past, and `report()` when you want the totals.
 
 And the shortest useful thing, when all you want is the set of numbers a column contains:
 
@@ -127,7 +199,8 @@ makes it pay off is inside one list anyway.
 
 | | |
 |---|---|
-| `Phone::audit(iterable, ?string)` | The whole verdict |
+| `Phone::audit(iterable, ?string)` | The whole verdict, entries kept |
+| `Phone::report(iterable, ?string)` | The verdict only, nothing kept |
 | `Phone::each(iterable, ?string)` | The same pass, streamed |
 | `Phone::e164List(iterable, ?string, bool)` | Just the distinct numbers |
 | `Phone::batch()` | The `PhoneBatch` service, for injection |
@@ -139,6 +212,7 @@ On the audit:
 | `entries()` · `valid()` · `invalid()` | The rows |
 | `distinct()` · `duplicates()` · `duplicateGroups()` · `unique()` | De-duplication |
 | `summary()` · `reasons()` · `countries()` · `types()` | The report |
+| `duplicateCounts()` | Exact duplicate totals (the groups are a sample) |
 | `report()` · `toArray()` · `jsonSerialize()` | Output |
 | `count()` · `isEmpty()` · iteration | It is `Countable` and `IteratorAggregate` |
 

@@ -19,6 +19,7 @@ use Simtabi\Laranail\Phone\PhoneScanner;
 use Simtabi\Laranail\Phone\ShortNumbers;
 use Simtabi\Laranail\Phone\Support\PhoneAudit;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
+use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
 use Simtabi\Laranail\Phone\Support\PhoneMatch;
 
 /**
@@ -44,6 +45,7 @@ use Simtabi\Laranail\Phone\Support\PhoneMatch;
  * @method static PhoneBuilder of(?string $input)
  * @method static PhoneAudit audit(iterable<mixed, string|null> $inputs, ?string $country = null)
  * @method static Generator<int, PhoneAuditEntry> each(iterable<mixed, string|null> $inputs, ?string $country = null)
+ * @method static PhoneAuditReport report(iterable<mixed, string|null> $inputs, ?string $country = null)
  * @method static list<string> e164List(iterable<mixed, string|null> $inputs, ?string $country = null, bool $validOnly = true)
  * @method static PhoneBatch batch()
  * @method static list<PhoneMatch> find(?string $text, ?string $country = null, ?MatchLeniency $leniency = null)
