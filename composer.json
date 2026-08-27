@@ -51,7 +51,7 @@
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.18",
         "orchestra/testbench": "^11.0",
-        "pestphp/pest": "^4.0",
+        "pestphp/pest": "^5.1",
         "rector/rector": "^2.5.8"
     },
     "suggest": {
