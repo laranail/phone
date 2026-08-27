@@ -1,6 +1,7 @@
 # Configuration
 
-Five settings, all with defaults that are safe to leave alone.
+Six blocks. Every default is safe to leave alone except the HTTP API, which is off and should stay
+off until someone has decided how it will be authenticated.
 
 Publish with `php artisan vendor:publish --tag=laranail::phone-config`, which writes
 `config/laranail/phone.php`. Everything resolves under `config('laranail.phone.*')`.
@@ -18,6 +19,15 @@ Publish with `php artisan vendor:publish --tag=laranail::phone-config`, which wr
 | `intel.locale` | `null` | The language those answers come back in; null follows the app locale |
 | `masks.cache_store` | `null` | Which cache store holds generated mask templates; null uses the default |
 | `masks.ttl` | `null` | How long to cache them; null means forever |
+| `scanning.leniency` | `'VALID'` | How readily free-text scanning accepts a candidate |
+| `scanning.limit` | `PHP_INT_MAX` | A ceiling on matches per scan |
+| `dialling.from` | `null` | The country calls are assumed to originate from |
+| `api.enabled` | `false` | **No routes exist until this is true** |
+| `api.prefix` | `api/laranail/phone` | Where the endpoints mount |
+| `api.middleware` | `['api']` | Not authentication — see below |
+| `api.throttle` | `'60,1'` | Appended unless the middleware already throttles; null opts out |
+| `api.max_batch` | `1000` | Enforced with a 422, never a truncation |
+| `api.allow_intel` | `true` | Whether a request may ask for carrier, geocoding and timezone |
 
 ## `default_country`
 
@@ -87,6 +97,65 @@ libphonenumber itself is upgraded, which is a deploy.
 
 > On the `array` cache driver, "forever" means "for this request". That is the driver's nature rather
 > than this setting's, but it is worth knowing before profiling a slow page.
+
+## `scanning`
+
+Defaults for `Phone::find()`, which locates numbers inside prose rather than parsing a field.
+
+```php
+'scanning' => [
+    'leniency' => env('PHONE_SCAN_LENIENCY', 'VALID'),
+    'limit' => (int) env('PHONE_SCAN_LIMIT', PHP_INT_MAX),
+],
+```
+
+`leniency` is the trade between missing numbers and inventing them, and the right point depends
+entirely on the text. `VALID` is the sensible default: a candidate must be a real number for some
+region, so an invoice reference is not mistaken for a phone number. `POSSIBLE` finds more and suits a
+support inbox; `EXACT_GROUPING` finds fewer and suits redacting a document, where a false positive
+destroys data. See [Scanner](tools/scanner.md).
+
+`limit` guards against a pathological input producing an unbounded result set.
+
+## `dialling`
+
+```php
+'dialling' => [
+    'from' => env('PHONE_DIAL_FROM'),
+],
+```
+
+The origin assumed by `dialFrom()` and `forMobile()` when none is given. E.164 is what you store; it
+is not what you dial. Calling a UK number from Kenya is `000 44 …`, from the United States
+`011 44 …`, and from inside the UK `020 …` — one stored value, three strings. See
+[Dialling](tools/dialling.md).
+
+## `api`
+
+Off, and turning it on is the whole security decision. Nothing is registered until `enabled` is
+`true`, so an install that never touches this adds no routes.
+
+```php
+'api' => [
+    'enabled' => env('PHONE_API_ENABLED', false),
+    'prefix' => env('PHONE_API_PREFIX', 'api/laranail/phone'),
+    'middleware' => ['api'],
+    'throttle' => env('PHONE_API_THROTTLE', '60,1'),
+    'max_batch' => (int) env('PHONE_API_MAX_BATCH', 1000),
+    'allow_intel' => env('PHONE_API_ALLOW_INTEL', true),
+],
+```
+
+> **`middleware` is not authentication.** `api` is Laravel's stock group — throttling and route-model
+> binding. Enabling the API with that alone publishes an endpoint that will parse anything anyone
+> sends it. Put `auth:sanctum`, a token middleware or an IP allow-list in the list first.
+
+The throttle is **appended** to whatever you configure, so your authentication runs first — rejecting
+an unauthenticated request should not spend its rate-limit budget. A throttle already in the list is
+left alone, because two limiters give a rate that is neither of the numbers written down.
+
+`allow_intel: false` refuses carrier, geocoding and timezone outright rather than relying on callers
+not to ask for them. Full reference: [HTTP API](tools/api.md).
 
 ---
 

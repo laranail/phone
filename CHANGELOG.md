@@ -7,7 +7,55 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `Phone::report()` — the verdict on a list of any size, without holding it. `audit()` keeps every
+  entry at O(n) and `each()` keeps nothing and gives up the report; this keeps only the tallies and a
+  bounded sample of row indexes, so a database column is auditable without a job at all. The two
+  paths share one definition of the report, so they cannot drift into disagreeing about what a
+  summary means.
+- `AuditPhoneColumn`, a queued job that audits a whole table column in chunks and caches the report
+  and its progress. It takes a model class rather than the rows because a queue payload has to
+  serialise and a generator does not, and it reads the column with `lazyById()` as one sequence —
+  auditing chunk by chunk and merging afterwards would restart row indexes per chunk and report rows
+  as duplicates of each other that are nothing of the kind.
+- `PhoneAuditReport::duplicateCounts()`, exact where `duplicateGroups()` is a capped sample.
+- `Phone::audit()` — judges a whole list in one pass, and answers two questions from it: what each
+  row is, and what is wrong with the list. The second is the one worth having. "53 invalid" sends an
+  operator through 53 rows; `reasons()` saying "49 too short" tells them the column was truncated on
+  export, and one fix clears all of them.
+- `Phone::each()`, the same pass streamed, for a file larger than memory. Duplicate detection
+  survives it — that needs only the first index seen per E.164 — and the report does not.
+- `Phone::e164List()`, the shortest useful thing to do with a column of whatever people typed.
+- Duplicates are detected on **E.164, not on the string**, so `0712 123456`, `+254 712 123456` and
+  `254712123456` are one number. `duplicateOf` points at the first row that produced it, so
+  de-duplicating is a filter and the survivor is deterministically the earliest row.
+- An opt-in HTTP API: `analyze`, `batch`, `audit`, `scan` and `countries`. **Off by default** — a
+  package that publishes endpoints by being installed changes an application's attack surface as a
+  side effect of `composer require`. When enabled it is throttled automatically, the throttle is
+  appended *after* your authentication so a rejected request does not spend its rate-limit budget,
+  and an over-sized batch is a 422 rather than a silent truncation.
+- `PossibilityReason::NotANumber`, for a string the parser refused outright.
+
 ### Changed
+
+- **A parse failure now reports why.** `PhoneNumberValue::possibility()` had nothing to go on once
+  libphonenumber had thrown, and guessed `INVALID_COUNTRY_CODE` for everything — so an audit of a
+  truncated CSV column reported a column of unknown calling codes, which sends an operator looking in
+  exactly the wrong place. The exception's error type is now recorded on the value object and
+  preferred.
+- PHPStan raised from level 8 to `max`, matching `laranail/email`. That surfaced two real cases: the
+  Eloquent casts turned a non-string column value into a string with `(string)`, so an array in a
+  phone column became the value object `"Array"` instead of null, and the service provider read
+  `config()` values that a wrong `.env` entry could make any type at all.
+- The `Without ext-intl` CI leg had never removed the extension. Leaving it off setup-php's list is a
+  no-op — the runner's PHP ships with intl enabled — so the job ran identically to the four matrix
+  legs while claiming to prove the fallback. Its own assertion caught this and turned the workflow
+  red, which is the assertion working. The comment above it was also describing a design the package
+  no longer has: it deals in ISO codes and never resolves a country name, so what the leg is worth
+  keeping for is the claim that ext-intl is a *suggest* rather than a requirement.
+- `config/phone.php` — the `masks` block had been separated from its own documentation by a later
+  insertion, so the file read as if `scanning` were the mask configuration.
 
 - `laranail/atlas` moved from `require` to `require-dev`. It was a hard dependency used nowhere in
   `src/` — this package deals in ISO 3166-1 alpha-2 codes and never resolves a country *name* — so it
@@ -21,6 +69,28 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   where the masks themselves were already cached and free; it is now 2.7 ms.
 
 ### Added
+
+- `Phone::of()` — a fluent builder. Narrow with `country()`/`from()`/`type()`, then ask: `isValid()`,
+  `why()`, `masked()`, `dialFrom()`, `areaCode()`, `matches()`. Immutable, and the parse is memoised
+  so twenty questions about one number cost one parse.
+- `PhoneScanner` — `find()`, `replaceIn()` and `redact()` over free text, wrapping libphonenumber's
+  `PhoneNumberMatcher`. Four leniency levels via `MatchLeniency`; `replaceIn()` walks matches in
+  reverse so earlier offsets stay valid.
+- `PhoneDialler` — `dialFrom()` and `forMobile()`, wrapping `formatOutOfCountryCallingNumber()` and
+  `formatNumberForMobileDialing()`. What a caller in one country actually dials to reach a number in
+  another, IDD prefix and all — not the same string as the international format.
+- `ShortNumbers` — emergency and short-code questions via `ShortNumberInfo`: `connectsToEmergency()`,
+  `isEmergency()`, `cost()`, `isCarrierSpecific()`, `acceptsSms()`. These need a region and say so
+  rather than guessing one.
+- `PhoneCatalogue` — the numbering plan itself: `regionsForCallingCode()` (so `+1` is a set, not
+  `US`), `primaryRegionForCallingCode()`, `callingCodeFor()`, `isNanp()`, `typesFor()`,
+  `isPortable()`, `nationalPrefix()`.
+- `PossibilityReason`, `MatchStrength`, `MatchLeniency` and `ShortNumberCost` — string-backed enums
+  over libphonenumber's `ValidationResult`, `MatchType`, `Leniency` and `ShortNumberCost`, with the
+  question each answers named on it (`isCorrectable()`, `isSame()`, `isChargeable()`).
+- `PhoneNumberValue::masked()`, `maskedByPercent()`, `possibility()`, `matches()`, `areaCode()`,
+  `nationalDestinationCode()`, `isGeographic()` and `isVanity()`.
+- Configuration for the new surfaces: `scanning.leniency`, `scanning.limit` and `dialling.from`.
 
 - `PhoneNumberValue` — an immutable value object carrying every rendering of a number (`e164`,
   `national`, `international`, `rfc3966`), its country, extension, type, validity, carrier, region

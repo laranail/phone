@@ -1,6 +1,6 @@
 {
     "name": "laranail/phone",
-    "description": "Phone numbers for Laravel \u2014 an immutable value object over libphonenumber, input normalisation, per-country input masks, Eloquent casts and a test-number factory.",
+    "description": "Phone numbers for Laravel — an immutable value object over libphonenumber, input normalisation, per-country input masks, Eloquent casts and a test-number factory.",
     "keywords": [
         "laravel",
         "laranail",
@@ -35,10 +35,15 @@
         "php": "^8.4.1 || ^8.5",
         "ext-mbstring": "*",
         "giggsey/libphonenumber-for-php": "^9.0",
+        "illuminate/bus": "^13.0",
         "illuminate/cache": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/database": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/queue": "^13.0",
+        "illuminate/routing": "^13.0",
         "illuminate/support": "^13.0",
+        "illuminate/validation": "^13.0",
         "laranail/package-tools": "^0.1"
     },
     "require-dev": {
@@ -50,8 +55,8 @@
         "rector/rector": "^2.5.8"
     },
     "suggest": {
-        "ext-intl": "Localised country names via Locale::getDisplayRegion(). This package does not resolve country names itself \u2014 it deals in ISO codes \u2014 so this only matters for calling code that does.",
-        "symfony/intl": "^7.0 || ^8.0 \u2014 deterministic localised country names that do not vary with the host's ICU version. Same caveat as ext-intl: consumed by your code, not by this package."
+        "ext-intl": "Localised country names via Locale::getDisplayRegion(). This package does not resolve country names itself — it deals in ISO codes — so this only matters for calling code that does.",
+        "symfony/intl": "^7.0 || ^8.0 — deterministic localised country names that do not vary with the host's ICU version. Same caveat as ext-intl: consumed by your code, not by this package."
     },
     "autoload": {
         "psr-4": {

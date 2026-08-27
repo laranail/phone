@@ -1,7 +1,8 @@
 # `PhoneNumberValue`
 
-Thirteen readonly properties and nine methods describing one parsed number —
-`Simtabi\Laranail\Phone\PhoneNumberValue`, returned by `Phone::parse()`.
+Twelve readonly properties and eighteen methods describing one parsed number —
+`Simtabi\Laranail\Phone\PhoneNumberValue`, returned by `Phone::parse()` and by every
+`Phone::of(...)` chain.
 
 It is immutable and it never throws. Every accessor has an answer for a number that could not be
 parsed, because the input that could not be parsed is exactly the input a form submitted.
@@ -21,6 +22,7 @@ parsed, because the input that could not be parsed is exactly the input a form s
 | `type` | `PhoneNumberType` | `Unknown` when it could not be determined |
 | `isValid` | `bool` | Allocated in the numbering plan |
 | `isPossible` | `bool` | Correctly shaped, allocated or not |
+| `failure` | `?PossibilityReason` | Why the parse threw, when it did — see below |
 
 ## Methods
 
@@ -52,13 +54,41 @@ A `wa.me` URL with the E.164 digits, no `+` and no punctuation, optionally pre-f
 Returns **null for a number that cannot receive one** — a landline, a short code — rather than
 producing a link that opens to an error. The check is `type->isMobile()`.
 
-### `masked(string $maskChar = '•'): string`
+### `possibility(): PossibilityReason`
+
+*Why* the number is not usable, rather than merely that it is not. `isPossible` is a boolean and a
+boolean cannot be acted on: "too short" tells a user to keep typing, "unknown calling code" tells
+them they pasted the wrong thing, and `PossibilityReason::isCorrectable()` separates the two.
+
+```php
+Phone::parse('+2547', 'KE')->possibility();          // PossibilityReason::TooShort
+Phone::parse('hello')->possibility()->label();       // 'Not a phone number'
+```
+
+> **A string the parser refuses outright now reports `NotANumber`.** Earlier versions had nothing to
+> go on once the parse had thrown, and guessed `InvalidCountryCode` for everything — so an audit of a
+> truncated CSV column reported a column of unknown calling codes, which sends an operator looking in
+> exactly the wrong place. The parse failure is now recorded on `failure` and preferred here.
+
+### `matches(self|string|null $other): MatchStrength`
+
+How closely this matches another number, graded rather than boolean — the honest answer depends on
+how much country context each side carries. `->matches($other)->isSame()` for a yes or no.
+
+### `areaCode(): ?string` · `nationalDestinationCode(): ?string` · `isGeographic(): bool` · `isVanity(): bool`
+
+The parts of the number below the calling code, and two questions about its shape. `areaCode()` is
+null where the plan has no geographic area code at all, which is most mobile ranges.
+
+### `masked(string $maskChar = '•', ?int $keep = null): string` · `maskedByPercent(int $percent = 60, string $maskChar = '•'): string`
 
 Obscures all but the calling code and the last digits:
 
 ```php
-Phone::parse('+254712123456')->masked();        // '+254 ••• •••456'
-Phone::parse('+254712123456')->masked('*');     // '+254 *** ***456'
+Phone::parse('+254712123456')->masked();          // '+254 ••• •••456'
+Phone::parse('+254712123456')->masked('*');       // '+254 *** ***456'
+Phone::parse('+254712123456')->masked(keep: 2);   // keep two trailing digits
+Phone::parse('+254712123456')->maskedByPercent(80);
 ```
 
 For screens where the number is context rather than content — a support queue, an audit log — and for
@@ -91,11 +121,17 @@ interchangeable with a string in a query binding or a log line.
 
 ## Enums
 
-Both live under `Simtabi\Laranail\Phone\Enums` and are string-backed — see
+Six, all under `Simtabi\Laranail\Phone\Enums` and all string-backed — see
 [Architecture](../architecture.md) for why.
 
-`PhoneNumberFormat` has four cases plus `isUnambiguous()` and `label()`.
-`PhoneNumberType` has fifteen plus `isMobile()`, `isPremium()` and `label()`.
+| Enum | Cases | Beyond `label()` |
+|---|---|---|
+| `PhoneNumberFormat` | 4 | `isUnambiguous()` |
+| `PhoneNumberType` | 15 | `isMobile()`, `isPremium()` |
+| `PossibilityReason` | 7 | `isPossible()`, `isCorrectable()` |
+| `MatchStrength` | 5 | `isSame()` |
+| `MatchLeniency` | 4 | `toLibPhoneNumber()` |
+| `ShortNumberCost` | 4 | `isChargeable()` |
 
 ```php
 PhoneNumberType::FixedLineOrMobile->isMobile();   // true — the NANP case

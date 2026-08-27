@@ -2,7 +2,7 @@ includes:
     - vendor/larastan/larastan/extension.neon
 
 parameters:
-    level: 8
+    level: max
     paths:
         - src
         # Pest binds `$this` to a TestCase at runtime through a mechanism PHPStan cannot follow, so

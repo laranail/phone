@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest a capability for laranail/phone
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. For open-ended ideas or questions, the
+        [Discussions board](https://github.com/laranail/phone/discussions) is often a better fit.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What is awkward or impossible today? Describe the situation, not the solution.
+      placeholder: When parsing ..., there is no way to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: What the call would look like if this existed.
+      render: php
+      placeholder: |
+        Phone::of('0712 123456')->country('KE')->newMethod();
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do instead today
+      description: The workaround, if there is one. "Nothing, I gave up" is a useful answer.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: I have checked this is not already possible with the documented API
+        - label: I am willing to open a PR for it
