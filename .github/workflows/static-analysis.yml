@@ -1,8 +1,6 @@
 name: Static analysis
 
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -17,6 +15,7 @@ jobs:
   analyse:
     name: PHPStan · Pint · Rector
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
