@@ -110,6 +110,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/laranail/enumerator"
+        },
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.org",
+            "exclude": [
+                "laranail/*"
+            ]
+        },
+        {
+            "packagist.org": false
         }
     ],
     "config": {
