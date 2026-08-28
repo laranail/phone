@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Casts;
 
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
-use Simtabi\Laranail\Phone\CountryReconciler;
 use Simtabi\Laranail\Phone\Facades\Phone;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
+use Simtabi\Laranail\Phone\CountryReconciler;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 /**
  * Casts a column to a {@see PhoneNumberValue}, keeping a sibling country column in sync.
@@ -91,6 +91,7 @@ final class AsPhoneNumber implements CastsAttributes
 
     /**
      * @param array<string, mixed> $attributes
+     *
      * @return array<string, mixed>
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): array
@@ -116,7 +117,7 @@ final class AsPhoneNumber implements CastsAttributes
         }
 
         return [
-            $key => $stored,
+            $key                 => $stored,
             $this->countryColumn => $number->country ?? $this->countryFrom($attributes),
         ];
     }
@@ -170,7 +171,7 @@ final class AsPhoneNumber implements CastsAttributes
             // write is not skipped as a no-op.
             $saving->setRawAttributes([
                 ...$attributes,
-                $key => $number->e164,
+                $key           => $number->e164,
                 $countryColumn => $number->country ?? $country,
             ]);
         });

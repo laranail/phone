@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Phone\Enums\MatchLeniency;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\Enums\PossibilityReason;
-use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
 use Simtabi\Laranail\Phone\Facades\Phone;
+use Simtabi\Laranail\Phone\Enums\MatchLeniency;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
 
 // =========================================================================
 // The fluent chain

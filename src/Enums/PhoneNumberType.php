@@ -40,45 +40,45 @@ enum PhoneNumberType: string
     case StandardRate = 'STANDARD_RATE';
     case Unknown = 'UNKNOWN';
 
-    public function toLibPhoneNumber(): LibType
-    {
-        return match ($this) {
-            self::FixedLine => LibType::FIXED_LINE,
-            self::Mobile => LibType::MOBILE,
-            self::FixedLineOrMobile => LibType::FIXED_LINE_OR_MOBILE,
-            self::TollFree => LibType::TOLL_FREE,
-            self::PremiumRate => LibType::PREMIUM_RATE,
-            self::SharedCost => LibType::SHARED_COST,
-            self::Voip => LibType::VOIP,
-            self::PersonalNumber => LibType::PERSONAL_NUMBER,
-            self::Pager => LibType::PAGER,
-            self::Uan => LibType::UAN,
-            self::Voicemail => LibType::VOICEMAIL,
-            self::Emergency => LibType::EMERGENCY,
-            self::ShortCode => LibType::SHORT_CODE,
-            self::StandardRate => LibType::STANDARD_RATE,
-            self::Unknown => LibType::UNKNOWN,
-        };
-    }
-
     public static function fromLibPhoneNumber(LibType $type): self
     {
         return match ($type) {
-            LibType::FIXED_LINE => self::FixedLine,
-            LibType::MOBILE => self::Mobile,
+            LibType::FIXED_LINE           => self::FixedLine,
+            LibType::MOBILE               => self::Mobile,
             LibType::FIXED_LINE_OR_MOBILE => self::FixedLineOrMobile,
-            LibType::TOLL_FREE => self::TollFree,
-            LibType::PREMIUM_RATE => self::PremiumRate,
-            LibType::SHARED_COST => self::SharedCost,
-            LibType::VOIP => self::Voip,
-            LibType::PERSONAL_NUMBER => self::PersonalNumber,
-            LibType::PAGER => self::Pager,
-            LibType::UAN => self::Uan,
-            LibType::VOICEMAIL => self::Voicemail,
-            LibType::EMERGENCY => self::Emergency,
-            LibType::SHORT_CODE => self::ShortCode,
-            LibType::STANDARD_RATE => self::StandardRate,
-            LibType::UNKNOWN => self::Unknown,
+            LibType::TOLL_FREE            => self::TollFree,
+            LibType::PREMIUM_RATE         => self::PremiumRate,
+            LibType::SHARED_COST          => self::SharedCost,
+            LibType::VOIP                 => self::Voip,
+            LibType::PERSONAL_NUMBER      => self::PersonalNumber,
+            LibType::PAGER                => self::Pager,
+            LibType::UAN                  => self::Uan,
+            LibType::VOICEMAIL            => self::Voicemail,
+            LibType::EMERGENCY            => self::Emergency,
+            LibType::SHORT_CODE           => self::ShortCode,
+            LibType::STANDARD_RATE        => self::StandardRate,
+            LibType::UNKNOWN              => self::Unknown,
+        };
+    }
+
+    public function toLibPhoneNumber(): LibType
+    {
+        return match ($this) {
+            self::FixedLine         => LibType::FIXED_LINE,
+            self::Mobile            => LibType::MOBILE,
+            self::FixedLineOrMobile => LibType::FIXED_LINE_OR_MOBILE,
+            self::TollFree          => LibType::TOLL_FREE,
+            self::PremiumRate       => LibType::PREMIUM_RATE,
+            self::SharedCost        => LibType::SHARED_COST,
+            self::Voip              => LibType::VOIP,
+            self::PersonalNumber    => LibType::PERSONAL_NUMBER,
+            self::Pager             => LibType::PAGER,
+            self::Uan               => LibType::UAN,
+            self::Voicemail         => LibType::VOICEMAIL,
+            self::Emergency         => LibType::EMERGENCY,
+            self::ShortCode         => LibType::SHORT_CODE,
+            self::StandardRate      => LibType::STANDARD_RATE,
+            self::Unknown           => LibType::UNKNOWN,
         };
     }
 
@@ -103,21 +103,21 @@ enum PhoneNumberType: string
     public function label(): string
     {
         return match ($this) {
-            self::FixedLine => 'Landline',
-            self::Mobile => 'Mobile',
+            self::FixedLine         => 'Landline',
+            self::Mobile            => 'Mobile',
             self::FixedLineOrMobile => 'Landline or mobile',
-            self::TollFree => 'Toll free',
-            self::PremiumRate => 'Premium rate',
-            self::SharedCost => 'Shared cost',
-            self::Voip => 'VoIP',
-            self::PersonalNumber => 'Personal number',
-            self::Pager => 'Pager',
-            self::Uan => 'Universal access number',
-            self::Voicemail => 'Voicemail',
-            self::Emergency => 'Emergency',
-            self::ShortCode => 'Short code',
-            self::StandardRate => 'Standard rate',
-            self::Unknown => 'Unknown',
+            self::TollFree          => 'Toll free',
+            self::PremiumRate       => 'Premium rate',
+            self::SharedCost        => 'Shared cost',
+            self::Voip              => 'VoIP',
+            self::PersonalNumber    => 'Personal number',
+            self::Pager             => 'Pager',
+            self::Uan               => 'Universal access number',
+            self::Voicemail         => 'Voicemail',
+            self::Emergency         => 'Emergency',
+            self::ShortCode         => 'Short code',
+            self::StandardRate      => 'Standard rate',
+            self::Unknown           => 'Unknown',
         };
     }
 }

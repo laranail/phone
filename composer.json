@@ -1,6 +1,6 @@
 {
     "name": "laranail/phone",
-    "description": "Phone numbers for Laravel — an immutable value object over libphonenumber, input normalisation, per-country input masks, Eloquent casts and a test-number factory.",
+    "description": "Phone numbers for Laravel \u2014 an immutable value object over libphonenumber, input normalisation, per-country input masks, Eloquent casts and a test-number factory.",
     "keywords": [
         "laravel",
         "laranail",
@@ -55,8 +55,8 @@
         "rector/rector": "^2.5.8"
     },
     "suggest": {
-        "ext-intl": "Localised country names via Locale::getDisplayRegion(). This package does not resolve country names itself — it deals in ISO codes — so this only matters for calling code that does.",
-        "symfony/intl": "^7.0 || ^8.0 — deterministic localised country names that do not vary with the host's ICU version. Same caveat as ext-intl: consumed by your code, not by this package."
+        "ext-intl": "Localised country names via Locale::getDisplayRegion(). This package does not resolve country names itself \u2014 it deals in ISO codes \u2014 so this only matters for calling code that does.",
+        "symfony/intl": "^7.0 || ^8.0 \u2014 deterministic localised country names that do not vary with the host's ICU version. Same caveat as ext-intl: consumed by your code, not by this package."
     },
     "autoload": {
         "psr-4": {
@@ -76,12 +76,13 @@
             "@phpstan",
             "@rector"
         ],
-        "pint": "vendor/bin/pint --test",
-        "pint-fix": "vendor/bin/pint",
+        "pint": "vendor/bin/pint --test --config vendor/laranail/package-tools/pint.json",
+        "pint-fix": "vendor/bin/pint --parallel --config vendor/laranail/package-tools/pint.json",
         "phpstan": "vendor/bin/phpstan analyse --no-progress",
         "analyse": "@phpstan",
         "rector": "vendor/bin/rector process --dry-run",
-        "rector-fix": "vendor/bin/rector process"
+        "rector-fix": "vendor/bin/rector process",
+        "format": "@pint-fix"
     },
     "extra": {
         "laravel": {

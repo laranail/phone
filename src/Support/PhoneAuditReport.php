@@ -162,13 +162,13 @@ final class PhoneAuditReport implements JsonSerializable
     public function summary(): array
     {
         return [
-            'total' => $this->total,
-            'valid' => $this->valid,
-            'invalid' => $this->total - $this->valid,
-            'possible' => $this->possible,
+            'total'      => $this->total,
+            'valid'      => $this->valid,
+            'invalid'    => $this->total - $this->valid,
+            'possible'   => $this->possible,
             'duplicates' => $this->duplicates,
-            'distinct' => $this->total - $this->duplicates,
-            'countries' => count($this->countries),
+            'distinct'   => $this->total - $this->duplicates,
+            'countries'  => count($this->countries),
         ];
     }
 
@@ -240,11 +240,11 @@ final class PhoneAuditReport implements JsonSerializable
     public function toArray(): array
     {
         return [
-            'summary' => $this->summary(),
-            'countries' => $this->countries(),
-            'types' => $this->types(),
-            'reasons' => $this->reasons(),
-            'duplicates' => $this->duplicateGroups(),
+            'summary'          => $this->summary(),
+            'countries'        => $this->countries(),
+            'types'            => $this->types(),
+            'reasons'          => $this->reasons(),
+            'duplicates'       => $this->duplicateGroups(),
             'duplicate_counts' => $this->duplicateCounts(),
         ];
     }
@@ -279,6 +279,7 @@ final class PhoneAuditReport implements JsonSerializable
     /**
      * @param array<string, int> $into
      * @param array<string, int> $from
+     *
      * @return array<string, int>
      */
     private function addTallies(array $into, array $from): array
@@ -292,6 +293,7 @@ final class PhoneAuditReport implements JsonSerializable
 
     /**
      * @param array<string, int> $counts
+     *
      * @return array<string, int>
      */
     private function sorted(array $counts): array

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
+use Throwable;
+use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumber as LibPhoneNumber;
-use libphonenumber\PhoneNumberUtil;
-use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PossibilityReason;
-use Throwable;
+use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 
 /**
  * The single point of contact with libphonenumber.

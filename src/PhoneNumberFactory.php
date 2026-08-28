@@ -77,6 +77,7 @@ final readonly class PhoneNumberFactory
      * For seeding a table that needs geographic spread rather than one country repeated.
      *
      * @param list<string> $countries
+     *
      * @return array<string, string>
      */
     public function spread(array $countries, PhoneNumberType $type = PhoneNumberType::Mobile): array

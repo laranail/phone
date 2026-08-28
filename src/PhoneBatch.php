@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use Generator;
+use Stringable;
 use Simtabi\Laranail\Phone\Support\PhoneAudit;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
 use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
-use Stringable;
 
 /**
  * Judges a list of numbers in one pass.
@@ -57,6 +57,7 @@ final readonly class PhoneBatch
      * until the generator is exhausted, and by then the entries are gone.
      *
      * @param iterable<mixed, string|null> $inputs
+     *
      * @return Generator<int, PhoneAuditEntry>
      */
     public function each(iterable $inputs, ?string $country = null): Generator
@@ -131,6 +132,7 @@ final readonly class PhoneBatch
      * is a real number.
      *
      * @param iterable<mixed, string|null> $inputs
+     *
      * @return list<string>
      */
     public function e164(iterable $inputs, ?string $country = null, bool $validOnly = true): array

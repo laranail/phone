@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
+use Simtabi\Laranail\Phone\PhoneBatch;
+use Simtabi\Laranail\Phone\PhoneScanner;
+use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Phone\PhoneCatalogue;
+use Simtabi\Laranail\Phone\PhoneFormatter;
 use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Phone\Enums\MatchLeniency;
 use Simtabi\Laranail\Phone\Http\PhonePresenter;
-use Simtabi\Laranail\Phone\PhoneBatch;
-use Simtabi\Laranail\Phone\PhoneCatalogue;
-use Simtabi\Laranail\Phone\PhoneFormatter;
-use Simtabi\Laranail\Phone\PhoneScanner;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
 
 /**
@@ -48,9 +48,9 @@ final readonly class PhoneApiController
     public function analyze(Request $request): JsonResponse
     {
         $input = $this->validate($request, [
-            'number' => ['required', 'string', 'max:60'],
+            'number'  => ['required', 'string', 'max:60'],
             'country' => ['nullable', 'string', 'size:2'],
-            'intel' => ['sometimes', 'boolean'],
+            'intel'   => ['sometimes', 'boolean'],
         ]);
 
         $number = $this->formatter->parse(
@@ -97,8 +97,8 @@ final readonly class PhoneApiController
                 ...$audit->report(),
                 'invalid' => array_map(
                     static fn (PhoneAuditEntry $entry): array => [
-                        'index' => $entry->index,
-                        'input' => $entry->input,
+                        'index'  => $entry->index,
+                        'input'  => $entry->input,
                         'reason' => $entry->reason()->value,
                     ],
                     $audit->invalid(),
@@ -111,8 +111,8 @@ final readonly class PhoneApiController
     public function scan(Request $request): JsonResponse
     {
         $input = $this->validate($request, [
-            'text' => ['required', 'string', 'max:100000'],
-            'country' => ['nullable', 'string', 'size:2'],
+            'text'     => ['required', 'string', 'max:100000'],
+            'country'  => ['nullable', 'string', 'size:2'],
             'leniency' => ['nullable', Rule::in(array_column(MatchLeniency::cases(), 'value'))],
         ]);
 
@@ -138,7 +138,7 @@ final readonly class PhoneApiController
     {
         $input = $this->validate($request, [
             'calling_code' => ['nullable', 'integer', 'min:1', 'max:999'],
-            'examples' => ['sometimes', 'boolean'],
+            'examples'     => ['sometimes', 'boolean'],
         ]);
 
         $callingCode = $input['calling_code'] ?? null;
@@ -160,6 +160,7 @@ final readonly class PhoneApiController
 
     /**
      * @param array<string, mixed> $rules
+     *
      * @return array<array-key, mixed>
      *
      * @throws ValidationException
@@ -183,10 +184,10 @@ final readonly class PhoneApiController
         $validated = $this->validate($request, [
             // `max` is enforced rather than applied: a caller that sent more than the cap gets a 422
             // naming the field, never a truncated answer it has no way to notice.
-            'numbers' => ['required', 'array', 'min:1', "max:{$max}"],
+            'numbers'   => ['required', 'array', 'min:1', "max:{$max}"],
             'numbers.*' => ['nullable', 'string', 'max:60'],
-            'country' => ['nullable', 'string', 'size:2'],
-            'intel' => ['sometimes', 'boolean'],
+            'country'   => ['nullable', 'string', 'size:2'],
+            'intel'     => ['sometimes', 'boolean'],
         ]);
 
         return $validated;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use libphonenumber\PhoneNumberUtil;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 
 /**
  * Builds an input-mask template for a country, from libphonenumber's own example numbers.
@@ -139,10 +139,10 @@ final class MaskGenerator
         }
 
         $descriptor = match ($type) {
-            PhoneNumberType::Mobile => $metadata->getMobile(),
+            PhoneNumberType::Mobile    => $metadata->getMobile(),
             PhoneNumberType::FixedLine => $metadata->getFixedLine(),
-            PhoneNumberType::TollFree => $metadata->getTollFree(),
-            default => null,
+            PhoneNumberType::TollFree  => $metadata->getTollFree(),
+            default                    => null,
         };
 
         $lengths = $descriptor?->getPossibleLength() ?? [];

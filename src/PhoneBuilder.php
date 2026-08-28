@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use InvalidArgumentException;
-use JsonSerializable;
-use Simtabi\Laranail\Phone\Enums\MatchStrength;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\Enums\PossibilityReason;
-use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
 use Stringable;
+use JsonSerializable;
+use InvalidArgumentException;
+use Simtabi\Laranail\Phone\Enums\MatchStrength;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
 
 /**
  * The fluent entry point: say what you have, then ask what you want.
@@ -47,6 +47,11 @@ final class PhoneBuilder implements JsonSerializable, Stringable
         private readonly ?string $country = null,
         private readonly PhoneNumberType $type = PhoneNumberType::Mobile,
     ) {}
+
+    public function __toString(): string
+    {
+        return (string) $this->value();
+    }
 
     // ---------------------------------------------------------------- narrowing
 
@@ -320,11 +325,6 @@ final class PhoneBuilder implements JsonSerializable, Stringable
     public function jsonSerialize(): array
     {
         return $this->value()->jsonSerialize();
-    }
-
-    public function __toString(): string
-    {
-        return (string) $this->value();
     }
 
     private function requireRegion(?string $region): string

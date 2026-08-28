@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use JsonSerializable;
-use libphonenumber\NumberParseException;
-use libphonenumber\PhoneNumber as LibPhoneNumber;
-use libphonenumber\PhoneNumberUtil;
-use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
-use Simtabi\Laranail\Phone\Enums\MatchStrength;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\Enums\PossibilityReason;
 use Stringable;
+use JsonSerializable;
+use libphonenumber\PhoneNumberUtil;
+use libphonenumber\NumberParseException;
+use Simtabi\Laranail\Phone\Enums\MatchStrength;
+use libphonenumber\PhoneNumber as LibPhoneNumber;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
+use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 
 /**
  * One phone number, parsed.
@@ -64,6 +64,17 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
         private ?ResolvesPhoneIntel $intel = null,
         public ?PossibilityReason $failure = null,
     ) {}
+
+    /**
+     * The E.164 form, or the raw input when there is none.
+     *
+     * This is what lands in a string context — `"{$phone}"`, a `where()` binding, an interpolated
+     * log line — so it is the canonical, unambiguous form rather than the pretty one.
+     */
+    public function __toString(): string
+    {
+        return $this->e164 ?? $this->raw;
+    }
 
     /** An empty value, for a null or blank input. */
     public static function empty(string $raw = ''): self
@@ -187,10 +198,10 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     public function format(PhoneNumberFormat $format): string
     {
         return match ($format) {
-            PhoneNumberFormat::E164 => $this->e164,
+            PhoneNumberFormat::E164          => $this->e164,
             PhoneNumberFormat::International => $this->international,
-            PhoneNumberFormat::National => $this->national,
-            PhoneNumberFormat::Rfc3966 => $this->rfc3966,
+            PhoneNumberFormat::National      => $this->national,
+            PhoneNumberFormat::Rfc3966       => $this->rfc3966,
         } ?? $this->raw;
     }
 
@@ -329,17 +340,17 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     public function toArray(): array
     {
         return [
-            'raw' => $this->raw,
-            'e164' => $this->e164,
-            'national' => $this->national,
+            'raw'           => $this->raw,
+            'e164'          => $this->e164,
+            'national'      => $this->national,
             'international' => $this->international,
-            'rfc3966' => $this->rfc3966,
-            'country' => $this->country,
-            'calling_code' => $this->callingCode,
-            'extension' => $this->extension,
-            'type' => $this->type->value,
-            'is_valid' => $this->isValid,
-            'is_possible' => $this->isPossible,
+            'rfc3966'       => $this->rfc3966,
+            'country'       => $this->country,
+            'calling_code'  => $this->callingCode,
+            'extension'     => $this->extension,
+            'type'          => $this->type->value,
+            'is_valid'      => $this->isValid,
+            'is_possible'   => $this->isPossible,
         ];
     }
 
@@ -349,17 +360,6 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     public function jsonSerialize(): array
     {
         return $this->toArray();
-    }
-
-    /**
-     * The E.164 form, or the raw input when there is none.
-     *
-     * This is what lands in a string context — `"{$phone}"`, a `where()` binding, an interpolated
-     * log line — so it is the canonical, unambiguous form rather than the pretty one.
-     */
-    public function __toString(): string
-    {
-        return $this->e164 ?? $this->raw;
     }
 
     /**

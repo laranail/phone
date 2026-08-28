@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone\Support;
 
 use JsonSerializable;
+use Simtabi\Laranail\Phone\PhoneNumberValue;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\Enums\PossibilityReason;
-use Simtabi\Laranail\Phone\PhoneNumberValue;
 
 /**
  * One row of a batch: the input, what it parsed to, and where it sits in the list.
@@ -84,17 +84,17 @@ final readonly class PhoneAuditEntry implements JsonSerializable
     public function toArray(): array
     {
         return [
-            'index' => $this->index,
-            'input' => $this->input,
-            'valid' => $this->number->isValid,
-            'possible' => $this->number->isPossible,
-            'reason' => $this->reason()->value,
-            'e164' => $this->number->e164,
-            'national' => $this->number->national,
+            'index'         => $this->index,
+            'input'         => $this->input,
+            'valid'         => $this->number->isValid,
+            'possible'      => $this->number->isPossible,
+            'reason'        => $this->reason()->value,
+            'e164'          => $this->number->e164,
+            'national'      => $this->number->national,
             'international' => $this->number->international,
-            'country' => $this->number->country,
-            'type' => $this->number->type->value,
-            'duplicate_of' => $this->duplicateOf,
+            'country'       => $this->number->country,
+            'type'          => $this->number->type->value,
+            'duplicate_of'  => $this->duplicateOf,
         ];
     }
 

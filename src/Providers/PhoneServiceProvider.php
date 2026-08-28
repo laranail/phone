@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Providers;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Database\Schema\Blueprint;
-use Simtabi\Laranail\Package\Tools\Package;
-use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
-use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
-use Simtabi\Laranail\Phone\CountryReconciler;
-use Simtabi\Laranail\Phone\Enums\MatchLeniency;
-use Simtabi\Laranail\Phone\Http\ApiRoutes;
-use Simtabi\Laranail\Phone\Http\PhonePresenter;
-use Simtabi\Laranail\Phone\MaskGenerator;
 use Simtabi\Laranail\Phone\PhoneBatch;
-use Simtabi\Laranail\Phone\PhoneCatalogue;
-use Simtabi\Laranail\Phone\PhoneDialler;
-use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Phone\PhoneIntel;
+use Simtabi\Laranail\Phone\PhoneDialler;
 use Simtabi\Laranail\Phone\PhoneManager;
-use Simtabi\Laranail\Phone\PhoneNormalizer;
-use Simtabi\Laranail\Phone\PhoneNumberFactory;
 use Simtabi\Laranail\Phone\PhoneScanner;
 use Simtabi\Laranail\Phone\ShortNumbers;
+use Illuminate\Database\Schema\Blueprint;
+use Simtabi\Laranail\Phone\MaskGenerator;
+use Simtabi\Laranail\Phone\Http\ApiRoutes;
+use Simtabi\Laranail\Phone\PhoneCatalogue;
+use Simtabi\Laranail\Phone\PhoneFormatter;
+use Illuminate\Contracts\Config\Repository;
+use Simtabi\Laranail\Package\Tools\Package;
+use Simtabi\Laranail\Phone\PhoneNormalizer;
+use Simtabi\Laranail\Phone\CountryReconciler;
+use Simtabi\Laranail\Phone\PhoneNumberFactory;
+use Simtabi\Laranail\Phone\Enums\MatchLeniency;
+use Simtabi\Laranail\Phone\Http\PhonePresenter;
+use Illuminate\Contracts\Foundation\Application;
+use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
+use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 
 /**
  * Wires `laranail/phone` onto the house {@see PackageServiceProvider}.

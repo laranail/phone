@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Simtabi\Laranail\Phone\PhoneBatch;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Simtabi\Laranail\Phone\Facades\Phone;
 use Simtabi\Laranail\Phone\Jobs\AuditPhoneColumn;
-use Simtabi\Laranail\Phone\PhoneBatch;
 use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
 
 /*
@@ -170,9 +170,9 @@ describe('the queued job', function (): void {
 
 class AuditableContact extends Model
 {
-    protected $table = 'contacts';
-
     public $timestamps = false;
+
+    protected $table = 'contacts';
 
     protected $guarded = [];
 
