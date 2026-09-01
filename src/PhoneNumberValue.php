@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use Stringable;
 use JsonSerializable;
-use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
-use Simtabi\Laranail\Phone\Enums\MatchStrength;
 use libphonenumber\PhoneNumber as LibPhoneNumber;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PossibilityReason;
+use libphonenumber\PhoneNumberUtil;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
+use Simtabi\Laranail\Phone\Enums\MatchStrength;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
+use Stringable;
 
 /**
  * One phone number, parsed.
@@ -39,15 +39,15 @@ use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 final readonly class PhoneNumberValue implements JsonSerializable, Stringable
 {
     /**
-     * @param string $raw What the user actually supplied, after normalisation
-     * @param string|null $e164 `+254712345678`, or null when unparseable
-     * @param string|null $national `0712 345678`, or null when unparseable
-     * @param string|null $international `+254 712 345678`, or null when unparseable
-     * @param string|null $rfc3966 `tel:+254-712-345678`, or null when unparseable
-     * @param string|null $country ISO 3166-1 alpha-2, or null when it could not be resolved
-     * @param string|null $extension Digits only, without any `ext` marker
-     * @param int|null $callingCode The country calling code as an integer, e.g. `254`
-     * @param PossibilityReason|null $failure Why the parse threw, when it did
+     * @param  string  $raw  What the user actually supplied, after normalisation
+     * @param  string|null  $e164  `+254712345678`, or null when unparseable
+     * @param  string|null  $national  `0712 345678`, or null when unparseable
+     * @param  string|null  $international  `+254 712 345678`, or null when unparseable
+     * @param  string|null  $rfc3966  `tel:+254-712-345678`, or null when unparseable
+     * @param  string|null  $country  ISO 3166-1 alpha-2, or null when it could not be resolved
+     * @param  string|null  $extension  Digits only, without any `ext` marker
+     * @param  int|null  $callingCode  The country calling code as an integer, e.g. `254`
+     * @param  PossibilityReason|null  $failure  Why the parse threw, when it did
      */
     public function __construct(
         public string $raw,
@@ -198,10 +198,10 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     public function format(PhoneNumberFormat $format): string
     {
         return match ($format) {
-            PhoneNumberFormat::E164          => $this->e164,
+            PhoneNumberFormat::E164 => $this->e164,
             PhoneNumberFormat::International => $this->international,
-            PhoneNumberFormat::National      => $this->national,
-            PhoneNumberFormat::Rfc3966       => $this->rfc3966,
+            PhoneNumberFormat::National => $this->national,
+            PhoneNumberFormat::Rfc3966 => $this->rfc3966,
         } ?? $this->raw;
     }
 
@@ -224,9 +224,9 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
             return null;
         }
 
-        $link = 'https://wa.me/' . ltrim($this->e164, '+');
+        $link = 'https://wa.me/'.ltrim($this->e164, '+');
 
-        return $message === null ? $link : $link . '?text=' . rawurlencode($message);
+        return $message === null ? $link : $link.'?text='.rawurlencode($message);
     }
 
     /**
@@ -241,7 +241,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
      * The default hides everything between, which is the right shape for a support queue or an audit
      * log: enough to recognise a number you already know, not enough to dial one you do not.
      *
-     * @param int|null $keep How many trailing digits to leave visible. Null keeps two.
+     * @param  int|null  $keep  How many trailing digits to leave visible. Null keeps two.
      */
     public function masked(string $maskChar = '•', ?int $keep = null): string
     {
@@ -249,7 +249,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
             return $this->raw === '' ? '' : str_repeat($maskChar, mb_strlen($this->raw));
         }
 
-        $prefix = '+' . ($this->callingCode ?? '');
+        $prefix = '+'.($this->callingCode ?? '');
         $rest = substr($this->e164, strlen($prefix));
         $keep = max(0, $keep ?? 2);
 
@@ -257,7 +257,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
             return $this->e164;
         }
 
-        return $prefix . str_repeat($maskChar, strlen($rest) - $keep) . ($keep === 0 ? '' : substr($rest, -$keep));
+        return $prefix.str_repeat($maskChar, strlen($rest) - $keep).($keep === 0 ? '' : substr($rest, -$keep));
     }
 
     /**
@@ -268,7 +268,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
      * two" does not. A nine-digit Kenyan mobile and a fifteen-digit international number masked to
      * two visible digits leak very different proportions of themselves.
      *
-     * @param int $percent How much of the national part to hide, 0–100
+     * @param  int  $percent  How much of the national part to hide, 0–100
      */
     public function maskedByPercent(int $percent = 60, string $maskChar = '•'): string
     {
@@ -276,7 +276,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
             return $this->masked($maskChar);
         }
 
-        $prefix = '+' . ($this->callingCode ?? '');
+        $prefix = '+'.($this->callingCode ?? '');
         $rest = substr($this->e164, strlen($prefix));
         $percent = max(0, min(100, $percent));
 
@@ -340,17 +340,17 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     public function toArray(): array
     {
         return [
-            'raw'           => $this->raw,
-            'e164'          => $this->e164,
-            'national'      => $this->national,
+            'raw' => $this->raw,
+            'e164' => $this->e164,
+            'national' => $this->national,
             'international' => $this->international,
-            'rfc3966'       => $this->rfc3966,
-            'country'       => $this->country,
-            'calling_code'  => $this->callingCode,
-            'extension'     => $this->extension,
-            'type'          => $this->type->value,
-            'is_valid'      => $this->isValid,
-            'is_possible'   => $this->isPossible,
+            'rfc3966' => $this->rfc3966,
+            'country' => $this->country,
+            'calling_code' => $this->callingCode,
+            'extension' => $this->extension,
+            'type' => $this->type->value,
+            'is_valid' => $this->isValid,
+            'is_possible' => $this->isPossible,
         ];
     }
 

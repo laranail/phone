@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Casts;
 
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Simtabi\Laranail\Phone\Facades\Phone;
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 /**
  * Normalises a column to E.164 on write, and leaves it a plain string on read.
@@ -33,7 +33,7 @@ final readonly class E164 implements CastsAttributes
     ) {}
 
     /**
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): ?string
     {
@@ -45,7 +45,7 @@ final readonly class E164 implements CastsAttributes
     }
 
     /**
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): ?string
     {

@@ -29,8 +29,8 @@ final readonly class CountryReconciler
     ) {}
 
     /**
-     * @param string|null $number The stored number, in any format
-     * @param string|null $country The stored ISO 3166-1 alpha-2 code, if any
+     * @param  string|null  $number  The stored number, in any format
+     * @param  string|null  $country  The stored ISO 3166-1 alpha-2 code, if any
      */
     public function reconcile(?string $number, ?string $country): CountryVerdict
     {

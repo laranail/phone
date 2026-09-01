@@ -22,15 +22,15 @@ beforeEach(function (): void {
 it('folds non-ASCII digits to ASCII', function (string $input, string $expected): void {
     expect($this->normalizer->normalize($input))->toBe($expected);
 })->with([
-    'Arabic-Indic'                    => ['٠٠٩٠٥٣٠١١١١١١١', '+905301111111'],
+    'Arabic-Indic' => ['٠٠٩٠٥٣٠١١١١١١١', '+905301111111'],
     'Extended Arabic-Indic (Persian)' => ['۰۰۹۰۵۳۰۱۱۱۱۱۱۱', '+905301111111'],
-    'mixed with ASCII'                => ['+٩٠ 530 ١١١ 11 ١١', '+90 530 111 11 11'],
+    'mixed with ASCII' => ['+٩٠ 530 ١١١ 11 ١١', '+90 530 111 11 11'],
 ]);
 
 it('promotes an international dialling prefix to a plus', function (string $input, string $expected): void {
     expect($this->normalizer->normalize($input))->toBe($expected);
 })->with([
-    '00 prefix'          => ['00905301111111', '+905301111111'],
+    '00 prefix' => ['00905301111111', '+905301111111'],
     '011 prefix, spaced' => ['011 90 530 111 11 11', '+905301111111'],
 ]);
 
@@ -60,9 +60,9 @@ it('folds typographic dashes and plus signs', function (): void {
 it('returns null when there is nothing to parse', function (?string $input): void {
     expect($this->normalizer->normalize($input))->toBeNull();
 })->with([
-    'null'             => [null],
-    'empty'            => [''],
-    'whitespace'       => ['   '],
+    'null' => [null],
+    'empty' => [''],
+    'whitespace' => ['   '],
     'punctuation only' => ['-- () --'],
 ]);
 
@@ -70,9 +70,9 @@ it('splits an extension off in every shape people write it', function (string $i
     expect($this->normalizer->normalize($input))->toBe($expected);
 })->with([
     'RFC 3966' => ['+15551234567;ext=890', '+15551234567;ext=890'],
-    'x890'     => ['+1 555 123 4567 x890', '+1 555 123 4567;ext=890'],
+    'x890' => ['+1 555 123 4567 x890', '+1 555 123 4567;ext=890'],
     'ext. 890' => ['+1 555 123 4567 ext. 890', '+1 555 123 4567;ext=890'],
-    'hash'     => ['+1 555 123 4567 #890', '+1 555 123 4567;ext=890'],
+    'hash' => ['+1 555 123 4567 #890', '+1 555 123 4567;ext=890'],
 ]);
 
 it('converts vanity letters only when asked', function (): void {

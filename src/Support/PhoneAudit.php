@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Support;
 
-use Countable;
-use Traversable;
 use ArrayIterator;
-use JsonSerializable;
+use Countable;
 use IteratorAggregate;
+use JsonSerializable;
 use Simtabi\Laranail\Phone\PhoneBatch;
+use Traversable;
 
 /**
  * The verdict on a whole list of numbers.
@@ -32,7 +32,7 @@ use Simtabi\Laranail\Phone\PhoneBatch;
 final readonly class PhoneAudit implements Countable, IteratorAggregate, JsonSerializable
 {
     /**
-     * @param list<PhoneAuditEntry> $entries
+     * @param  list<PhoneAuditEntry>  $entries
      */
     public function __construct(public array $entries) {}
 
@@ -173,13 +173,13 @@ final readonly class PhoneAudit implements Countable, IteratorAggregate, JsonSer
         $duplicates = count($this->duplicates());
 
         return [
-            'total'      => count($this->entries),
-            'valid'      => $valid,
-            'invalid'    => count($this->entries) - $valid,
-            'possible'   => count(array_filter($this->entries, static fn (PhoneAuditEntry $e): bool => $e->isPossible())),
+            'total' => count($this->entries),
+            'valid' => $valid,
+            'invalid' => count($this->entries) - $valid,
+            'possible' => count(array_filter($this->entries, static fn (PhoneAuditEntry $e): bool => $e->isPossible())),
             'duplicates' => $duplicates,
-            'distinct'   => count($this->entries) - $duplicates,
-            'countries'  => count($this->countries()),
+            'distinct' => count($this->entries) - $duplicates,
+            'countries' => count($this->countries()),
         ];
     }
 
@@ -238,9 +238,8 @@ final readonly class PhoneAudit implements Countable, IteratorAggregate, JsonSer
     }
 
     /**
-     * @param callable(PhoneAuditEntry): ?string $key
-     * @param list<PhoneAuditEntry>|array<int, PhoneAuditEntry>|null $over
-     *
+     * @param  callable(PhoneAuditEntry): ?string  $key
+     * @param  list<PhoneAuditEntry>|array<int, PhoneAuditEntry>|null  $over
      * @return array<string, int>
      */
     private function tally(callable $key, ?array $over = null): array

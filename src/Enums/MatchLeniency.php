@@ -31,20 +31,20 @@ enum MatchLeniency: string
     public function toLibPhoneNumber(): AbstractLeniency
     {
         return match ($this) {
-            self::Possible       => Leniency::POSSIBLE(),
-            self::Valid          => Leniency::VALID(),
+            self::Possible => Leniency::POSSIBLE(),
+            self::Valid => Leniency::VALID(),
             self::StrictGrouping => Leniency::STRICT_GROUPING(),
-            self::ExactGrouping  => Leniency::EXACT_GROUPING(),
+            self::ExactGrouping => Leniency::EXACT_GROUPING(),
         };
     }
 
     public function label(): string
     {
         return match ($this) {
-            self::Possible       => 'Possible',
-            self::Valid          => 'Valid',
+            self::Possible => 'Possible',
+            self::Valid => 'Valid',
             self::StrictGrouping => 'Strictly grouped',
-            self::ExactGrouping  => 'Exactly grouped',
+            self::ExactGrouping => 'Exactly grouped',
         };
     }
 }
