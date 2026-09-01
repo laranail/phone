@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Http;
 
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\MaskGenerator;
 use Simtabi\Laranail\Phone\PhoneCatalogue;
 use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
-use Simtabi\Laranail\Phone\Support\PhoneMatch;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
+use Simtabi\Laranail\Phone\Support\PhoneMatch;
 
 /**
  * Turns the package's objects into the JSON the API returns.
@@ -40,23 +40,23 @@ final readonly class PhonePresenter
     public function number(PhoneNumberValue $number, bool $withIntel = false): array
     {
         $payload = [
-            'input'         => $number->raw,
-            'valid'         => $number->isValid,
-            'possible'      => $number->isPossible,
-            'reason'        => $number->possibility()->value,
-            'reason_label'  => $number->possibility()->label(),
-            'e164'          => $number->e164,
-            'national'      => $number->national,
+            'input' => $number->raw,
+            'valid' => $number->isValid,
+            'possible' => $number->isPossible,
+            'reason' => $number->possibility()->value,
+            'reason_label' => $number->possibility()->label(),
+            'e164' => $number->e164,
+            'national' => $number->national,
             'international' => $number->international,
-            'rfc3966'       => $number->rfc3966,
-            'country'       => $number->country,
-            'calling_code'  => $number->callingCode,
-            'extension'     => $number->extension,
-            'type'          => $number->type->value,
-            'type_label'    => $number->type->label(),
-            'area_code'     => $number->areaCode(),
-            'geographic'    => $number->isGeographic(),
-            'tel_link'      => $number->telLink(),
+            'rfc3966' => $number->rfc3966,
+            'country' => $number->country,
+            'calling_code' => $number->callingCode,
+            'extension' => $number->extension,
+            'type' => $number->type->value,
+            'type_label' => $number->type->label(),
+            'area_code' => $number->areaCode(),
+            'geographic' => $number->isGeographic(),
+            'tel_link' => $number->telLink(),
         ];
 
         if (! $withIntel) {
@@ -65,9 +65,9 @@ final readonly class PhonePresenter
 
         return [
             ...$payload,
-            'carrier'     => $number->carrier(),
+            'carrier' => $number->carrier(),
             'description' => $number->description(),
-            'timezones'   => $number->timezones(),
+            'timezones' => $number->timezones(),
         ];
     }
 
@@ -79,7 +79,7 @@ final readonly class PhonePresenter
     public function entry(PhoneAuditEntry $entry, bool $withIntel = false): array
     {
         return [
-            'index'        => $entry->index,
+            'index' => $entry->index,
             'duplicate_of' => $entry->duplicateOf,
             ...$this->number($entry->number, $withIntel),
         ];
@@ -93,7 +93,7 @@ final readonly class PhonePresenter
         return [
             ...$match->toArray(),
             'valid' => $match->number->isValid,
-            'type'  => $match->number->type->value,
+            'type' => $match->number->type->value,
         ];
     }
 
@@ -109,10 +109,10 @@ final readonly class PhonePresenter
     public function region(string $region, bool $withExamples = false): array
     {
         $payload = [
-            'country'         => $region,
-            'calling_code'    => $this->catalogue->callingCodeFor($region),
-            'nanp'            => $this->catalogue->isNanp($region),
-            'portable'        => $this->catalogue->isPortable($region),
+            'country' => $region,
+            'calling_code' => $this->catalogue->callingCodeFor($region),
+            'nanp' => $this->catalogue->isNanp($region),
+            'portable' => $this->catalogue->isPortable($region),
             'national_prefix' => $this->catalogue->nationalPrefix($region),
         ];
 
@@ -124,10 +124,10 @@ final readonly class PhonePresenter
 
         return [
             ...$payload,
-            'example'          => $example?->e164,
+            'example' => $example?->e164,
             'example_national' => $example?->national,
-            'mask'             => $this->masks->national($region),
-            'placeholder'      => $this->masks->placeholder($region),
+            'mask' => $this->masks->national($region),
+            'placeholder' => $this->masks->placeholder($region),
         ];
     }
 }

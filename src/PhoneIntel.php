@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use libphonenumber\PhoneNumberUtil;
+use libphonenumber\geocoding\PhoneNumberOfflineGeocoder;
 use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumber as LibPhoneNumber;
 use libphonenumber\PhoneNumberToCarrierMapper;
 use libphonenumber\PhoneNumberToTimeZonesMapper;
-use libphonenumber\PhoneNumber as LibPhoneNumber;
-use libphonenumber\geocoding\PhoneNumberOfflineGeocoder;
+use libphonenumber\PhoneNumberUtil;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 
 /**

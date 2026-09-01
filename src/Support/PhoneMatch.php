@@ -35,10 +35,10 @@ final readonly class PhoneMatch
     public function toArray(): array
     {
         return [
-            'raw'     => $this->raw,
-            'offset'  => $this->offset,
-            'end'     => $this->end(),
-            'e164'    => $this->number->e164,
+            'raw' => $this->raw,
+            'offset' => $this->offset,
+            'end' => $this->end(),
+            'e164' => $this->number->e164,
             'country' => $this->number->country,
         ];
     }

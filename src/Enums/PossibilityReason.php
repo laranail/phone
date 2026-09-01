@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Enums;
 
-use libphonenumber\ValidationResult;
 use libphonenumber\NumberParseException;
+use libphonenumber\ValidationResult;
 
 /**
  * Why a number is not possible.
@@ -48,12 +48,12 @@ enum PossibilityReason: string
     public static function fromLibPhoneNumber(ValidationResult $result): self
     {
         return match ($result) {
-            ValidationResult::IS_POSSIBLE            => self::IsPossible,
+            ValidationResult::IS_POSSIBLE => self::IsPossible,
             ValidationResult::IS_POSSIBLE_LOCAL_ONLY => self::IsPossibleLocalOnly,
-            ValidationResult::INVALID_COUNTRY_CODE   => self::InvalidCountryCode,
-            ValidationResult::TOO_SHORT              => self::TooShort,
-            ValidationResult::TOO_LONG               => self::TooLong,
-            ValidationResult::INVALID_LENGTH         => self::InvalidLength,
+            ValidationResult::INVALID_COUNTRY_CODE => self::InvalidCountryCode,
+            ValidationResult::TOO_SHORT => self::TooShort,
+            ValidationResult::TOO_LONG => self::TooLong,
+            ValidationResult::INVALID_LENGTH => self::InvalidLength,
         };
     }
 
@@ -68,10 +68,10 @@ enum PossibilityReason: string
     {
         return match ($exception->getErrorType()) {
             NumberParseException::TOO_SHORT_AFTER_IDD,
-            NumberParseException::TOO_SHORT_NSN        => self::TooShort,
-            NumberParseException::TOO_LONG             => self::TooLong,
+            NumberParseException::TOO_SHORT_NSN => self::TooShort,
+            NumberParseException::TOO_LONG => self::TooLong,
             NumberParseException::INVALID_COUNTRY_CODE => self::InvalidCountryCode,
-            default                                    => self::NotANumber,
+            default => self::NotANumber,
         };
     }
 
@@ -91,20 +91,20 @@ enum PossibilityReason: string
     {
         return match ($this) {
             self::TooShort, self::TooLong, self::InvalidLength => true,
-            default                                            => false,
+            default => false,
         };
     }
 
     public function label(): string
     {
         return match ($this) {
-            self::IsPossible          => 'Possible',
+            self::IsPossible => 'Possible',
             self::IsPossibleLocalOnly => 'Local only',
-            self::InvalidCountryCode  => 'Unknown calling code',
-            self::TooShort            => 'Too short',
-            self::TooLong             => 'Too long',
-            self::InvalidLength       => 'Not a valid length',
-            self::NotANumber          => 'Not a phone number',
+            self::InvalidCountryCode => 'Unknown calling code',
+            self::TooShort => 'Too short',
+            self::TooLong => 'Too long',
+            self::InvalidLength => 'Not a valid length',
+            self::NotANumber => 'Not a phone number',
         };
     }
 }
