@@ -59,10 +59,10 @@ final readonly class PhoneNumberFactory
 
         // Push the subscriber digits into an unallocated range while keeping the length and the
         // calling code intact, so the result is possible-but-invalid rather than merely malformed.
-        $prefix = '+'.$example->callingCode;
+        $prefix = '+' . $example->callingCode;
         $rest = substr($example->e164, strlen($prefix));
 
-        return $prefix.'0'.substr(str_repeat('1', strlen($rest)), 1);
+        return $prefix . '0' . substr(str_repeat('1', strlen($rest)), 1);
     }
 
     /** Input that cannot be parsed at all, for testing the fallback path. */
@@ -76,7 +76,8 @@ final readonly class PhoneNumberFactory
      *
      * For seeding a table that needs geographic spread rather than one country repeated.
      *
-     * @param  list<string>  $countries
+     * @param list<string> $countries
+     *
      * @return array<string, string>
      */
     public function spread(array $countries, PhoneNumberType $type = PhoneNumberType::Mobile): array

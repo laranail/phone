@@ -24,38 +24,38 @@ return [
     'wrong_type' => 'The :attribute field must be a :type number.',
 
     // A short code or emergency number where a full number is required.
-    'short_number' => 'The :attribute field must be a full phone number, not a short code.',
+    'short_number'     => 'The :attribute field must be a full phone number, not a short code.',
     'emergency_number' => 'The :attribute field must not be an emergency number.',
 
     // The same number already exists, in any format.
     'unique' => 'This phone number is already registered.',
 
     // Field affordances.
-    'country_code' => 'Country calling code',
-    'placeholder' => 'Phone number',
-    'select_country' => 'Select a country',
-    'search_countries' => 'Search countries',
-    'no_countries_found' => 'No countries found',
-    'call' => 'Call :number',
+    'country_code'        => 'Country calling code',
+    'placeholder'         => 'Phone number',
+    'select_country'      => 'Select a country',
+    'search_countries'    => 'Search countries',
+    'no_countries_found'  => 'No countries found',
+    'call'                => 'Call :number',
     'message_on_whatsapp' => 'Message :number on WhatsApp',
 
     // Line types, for a badge or a filter.
     'types' => [
-        'FIXED_LINE' => 'Landline',
-        'MOBILE' => 'Mobile',
+        'FIXED_LINE'           => 'Landline',
+        'MOBILE'               => 'Mobile',
         'FIXED_LINE_OR_MOBILE' => 'Landline or mobile',
-        'TOLL_FREE' => 'Toll free',
-        'PREMIUM_RATE' => 'Premium rate',
-        'SHARED_COST' => 'Shared cost',
-        'VOIP' => 'VoIP',
-        'PERSONAL_NUMBER' => 'Personal number',
-        'PAGER' => 'Pager',
-        'UAN' => 'Universal access number',
-        'VOICEMAIL' => 'Voicemail',
-        'EMERGENCY' => 'Emergency',
-        'SHORT_CODE' => 'Short code',
-        'STANDARD_RATE' => 'Standard rate',
-        'UNKNOWN' => 'Unknown',
+        'TOLL_FREE'            => 'Toll free',
+        'PREMIUM_RATE'         => 'Premium rate',
+        'SHARED_COST'          => 'Shared cost',
+        'VOIP'                 => 'VoIP',
+        'PERSONAL_NUMBER'      => 'Personal number',
+        'PAGER'                => 'Pager',
+        'UAN'                  => 'Universal access number',
+        'VOICEMAIL'            => 'Voicemail',
+        'EMERGENCY'            => 'Emergency',
+        'SHORT_CODE'           => 'Short code',
+        'STANDARD_RATE'        => 'Standard rate',
+        'UNKNOWN'              => 'Unknown',
     ],
 
 ];

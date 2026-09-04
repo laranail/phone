@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
-use Simtabi\Laranail\Phone\CountryReconciler;
+use Illuminate\Database\Schema\Blueprint;
 use Simtabi\Laranail\Phone\Facades\Phone;
 use Simtabi\Laranail\Phone\MaskGenerator;
 use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Phone\PhoneNormalizer;
+use Simtabi\Laranail\Phone\CountryReconciler;
 use Simtabi\Laranail\Phone\PhoneNumberFactory;
+use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 
 it('namespaces its config under the vendor key', function (): void {
     // `config('phone')` would be a bare slug in a flat registry — a plausible collision with an

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
+use Throwable;
+use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumber as LibPhoneNumber;
-use libphonenumber\PhoneNumberUtil;
-use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Enums\PossibilityReason;
-use Throwable;
+use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 
 /**
  * The single point of contact with libphonenumber.
@@ -45,9 +45,9 @@ final readonly class PhoneFormatter
     /**
      * Parse anything into a value object.
      *
-     * @param  string|null  $country  ISO 3166-1 alpha-2 hint. Only consulted when the input does not
-     *                                already carry its own country code, so passing the wrong one
-     *                                cannot corrupt a number written in E.164.
+     * @param string|null $country ISO 3166-1 alpha-2 hint. Only consulted when the input does not
+     *                             already carry its own country code, so passing the wrong one
+     *                             cannot corrupt a number written in E.164.
      */
     public function parse(?string $input, ?string $country = null): PhoneNumberValue
     {

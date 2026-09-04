@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\MaskGenerator;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 
 beforeEach(function (): void {
     $this->masks = new MaskGenerator;
@@ -12,11 +12,11 @@ beforeEach(function (): void {
 it('builds a national mask where the numbering plan has one length', function (string $country, string $expected): void {
     expect($this->masks->national($country))->toBe($expected);
 })->with([
-    'Kenya' => ['KE', '9999 999999'],
+    'Kenya'          => ['KE', '9999 999999'],
     'United Kingdom' => ['GB', '99999 999999'],
-    'Türkiye' => ['TR', '9999 999 99 99'],
-    'Nigeria' => ['NG', '9999 999 9999'],
-    'United States' => ['US', '(999) 999-9999'],
+    'Türkiye'        => ['TR', '9999 999 99 99'],
+    'Nigeria'        => ['NG', '9999 999 9999'],
+    'United States'  => ['US', '(999) 999-9999'],
 ]);
 
 it('builds an international mask including the calling code', function (): void {

@@ -48,7 +48,7 @@ return [
     // | geocoding in about forty.
     'intel' => [
         'enabled' => env('PHONE_INTEL', true),
-        'locale' => null,
+        'locale'  => null,
     ],
 
     // |----------------------------------------------------------------------
@@ -64,7 +64,7 @@ return [
     // | itself is upgraded.
     'masks' => [
         'cache_store' => env('PHONE_MASK_CACHE_STORE'),
-        'ttl' => null,
+        'ttl'         => null,
     ],
 
     // |----------------------------------------------------------------------

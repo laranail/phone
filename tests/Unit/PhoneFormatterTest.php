@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\PhoneFormatter;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 
 beforeEach(function (): void {
     $this->formatter = new PhoneFormatter;
@@ -13,10 +13,10 @@ beforeEach(function (): void {
 it('renders every format for a known number', function (PhoneNumberFormat $format, string $expected): void {
     expect($this->formatter->format('+905301111111', $format))->toBe($expected);
 })->with([
-    'E.164' => [PhoneNumberFormat::E164, '+905301111111'],
+    'E.164'         => [PhoneNumberFormat::E164, '+905301111111'],
     'international' => [PhoneNumberFormat::International, '+90 530 111 11 11'],
-    'national' => [PhoneNumberFormat::National, '0530 111 11 11'],
-    'RFC 3966' => [PhoneNumberFormat::Rfc3966, 'tel:+90-530-111-11-11'],
+    'national'      => [PhoneNumberFormat::National, '0530 111 11 11'],
+    'RFC 3966'      => [PhoneNumberFormat::Rfc3966, 'tel:+90-530-111-11-11'],
 ]);
 
 it('populates the whole value object', function (): void {
@@ -64,17 +64,17 @@ it('never throws on input it cannot parse', function (string $input): void {
         ->and($number->format(PhoneNumberFormat::E164))->toBe($input)
         ->and((string) $number)->toBe($input);
 })->with([
-    'prose' => ['not a number at all 42'],
+    'prose'     => ['not a number at all 42'],
     'lone plus' => ['+'],
-    'letters' => ['abcdef'],
+    'letters'   => ['abcdef'],
 ]);
 
 it('returns an empty value for blank input', function (?string $input): void {
     expect($this->formatter->parse($input)->isEmpty())->toBeTrue()
         ->and($this->formatter->toE164($input))->toBeNull();
 })->with([
-    'null' => [null],
-    'empty' => [''],
+    'null'       => [null],
+    'empty'      => [''],
     'whitespace' => ['   '],
 ]);
 
@@ -90,7 +90,7 @@ it('normalises before parsing', function (): void {
 it('classifies line types', function (string $number, PhoneNumberType $expected): void {
     expect($this->formatter->parse($number)->type)->toBe($expected);
 })->with([
-    'Turkish mobile' => ['+905301111111', PhoneNumberType::Mobile],
+    'Turkish mobile'   => ['+905301111111', PhoneNumberType::Mobile],
     'Turkish landline' => ['+902125111111', PhoneNumberType::FixedLine],
     // In the NANP mobile and fixed-line share ranges, so "both" is the honest answer. Code that
     // treats this as "not mobile" rejects valid North American mobiles.
