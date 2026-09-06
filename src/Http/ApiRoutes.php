@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Http;
 
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Config\Repository;
 use Simtabi\Laranail\Phone\Http\Controllers\PhoneApiController;
 
 /**

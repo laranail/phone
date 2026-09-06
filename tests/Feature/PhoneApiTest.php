@@ -123,7 +123,7 @@ describe('with the API enabled', function (): void {
 
     it('finds numbers in free text with their offsets', function (): void {
         $this->postJson('api/laranail/phone/scan', [
-            'text' => 'Call me on 0712 123456 or 0733 111222 after six.',
+            'text'    => 'Call me on 0712 123456 or 0733 111222 after six.',
             'country' => 'KE',
         ])
             ->assertOk()
@@ -199,7 +199,7 @@ describe('middleware', function (): void {
 
         Route::getRoutes()->refreshNameLookups();
 
-        $route = Route::getRoutes()->getByName(ApiRoutes::NAME_PREFIX.'batch');
+        $route = Route::getRoutes()->getByName(ApiRoutes::NAME_PREFIX . 'batch');
 
         expect($route)->not->toBeNull()
             ->and($route->gatherMiddleware())->toContain('auth:sanctum', 'throttle:60,1');

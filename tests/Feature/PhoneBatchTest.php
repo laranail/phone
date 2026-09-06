@@ -28,11 +28,11 @@ it('answers per-row and in aggregate from one pass', function (): void {
 
     expect($audit)->toHaveCount(5)
         ->and($audit->summary())->toMatchArray([
-            'total' => 5,
-            'valid' => 3,
-            'invalid' => 2,
+            'total'      => 5,
+            'valid'      => 3,
+            'invalid'    => 2,
             'duplicates' => 1,
-            'distinct' => 4,
+            'distinct'   => 4,
         ])
         ->and($audit->unique())->toBe(['+254712123456', '+12015550123'])
         ->and(array_keys($audit->countries()))->toEqualCanonicalizing(['KE', 'US']);
@@ -139,10 +139,10 @@ it('serialises the whole verdict, entries and all', function (): void {
 
     expect($json)->toHaveKeys(['summary', 'countries', 'types', 'reasons', 'duplicates', 'entries'])
         ->and($json['entries'][0])->toMatchArray([
-            'index' => 0,
-            'input' => '+254712123456',
-            'valid' => true,
-            'country' => 'KE',
+            'index'        => 0,
+            'input'        => '+254712123456',
+            'valid'        => true,
+            'country'      => 'KE',
             'duplicate_of' => null,
         ]);
 });

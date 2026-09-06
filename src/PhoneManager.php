@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use Generator;
-use Simtabi\Laranail\Phone\Enums\MatchLeniency;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\Support\PhoneAudit;
+use Simtabi\Laranail\Phone\Support\PhoneMatch;
+use Simtabi\Laranail\Phone\Enums\MatchLeniency;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
 use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
-use Simtabi\Laranail\Phone\Support\PhoneMatch;
 
 /**
  * What the `Phone` facade resolves to.
@@ -62,7 +62,7 @@ final readonly class PhoneManager
      * $audit->distinct();    // the rows to keep
      * ```
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
      */
     public function audit(iterable $inputs, ?string $country = null): PhoneAudit
     {
@@ -72,7 +72,8 @@ final readonly class PhoneManager
     /**
      * The same pass, streamed. Nothing is accumulated, so the input may be larger than memory.
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
+     *
      * @return Generator<int, PhoneAuditEntry>
      */
     public function each(iterable $inputs, ?string $country = null): Generator
@@ -86,7 +87,7 @@ final readonly class PhoneManager
      * O(distinct) rather than O(n), so this is the one to reach for when the input is a database
      * column or a file rather than a form submission.
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
      */
     public function report(iterable $inputs, ?string $country = null): PhoneAuditReport
     {
@@ -96,7 +97,8 @@ final readonly class PhoneManager
     /**
      * A list of whatever people typed, in: the distinct E.164 numbers it contains, out.
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
+     *
      * @return list<string>
      */
     public function e164List(iterable $inputs, ?string $country = null, bool $validOnly = true): array

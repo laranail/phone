@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use libphonenumber\PhoneNumber;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberMatch;
 use libphonenumber\PhoneNumberUtil;
-use Simtabi\Laranail\Phone\Enums\MatchLeniency;
+use libphonenumber\PhoneNumberMatch;
+use libphonenumber\PhoneNumberFormat;
 use Simtabi\Laranail\Phone\Support\PhoneMatch;
+use Simtabi\Laranail\Phone\Enums\MatchLeniency;
 
 /**
  * Finds phone numbers inside free text.
@@ -42,9 +42,10 @@ final readonly class PhoneScanner
     /**
      * Every number in the text, in the order it appears.
      *
-     * @param  string|null  $country  ISO 3166-1 alpha-2 the text is assumed to be written from. Numbers
-     *                                carrying their own calling code are found regardless; this decides
-     *                                whether a bare national number is recognised at all.
+     * @param string|null $country ISO 3166-1 alpha-2 the text is assumed to be written from. Numbers
+     *                             carrying their own calling code are found regardless; this decides
+     *                             whether a bare national number is recognised at all.
+     *
      * @return list<PhoneMatch>
      */
     public function scan(?string $text, ?string $country = null, ?MatchLeniency $leniency = null): array
@@ -87,7 +88,7 @@ final readonly class PhoneScanner
      * the difference in length, and the second replacement lands in the wrong place. Going backwards
      * means each offset is still valid when it is used.
      *
-     * @param  callable(PhoneMatch): string  $replace
+     * @param callable(PhoneMatch): string $replace
      */
     public function replace(?string $text, callable $replace, ?string $country = null): ?string
     {

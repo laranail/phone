@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumber;
-use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\NumberParseException;
 
 /**
  * How to actually dial a number from somewhere.
@@ -34,7 +34,7 @@ final readonly class PhoneDialler
      * Includes that country's international dialling prefix where one is needed, and drops it
      * entirely for a domestic call.
      *
-     * @param  string  $from  ISO 3166-1 alpha-2 of the caller
+     * @param string $from ISO 3166-1 alpha-2 of the caller
      */
     public function from(?string $input, string $from, ?string $country = null): ?string
     {
@@ -52,7 +52,7 @@ final readonly class PhoneDialler
      * the canonical form omits — libphonenumber knows which, and guessing produces a number that
      * dials on a landline and fails on a phone.
      *
-     * @param  bool  $withFormatting  Keep the spacing a human would read, rather than digits only
+     * @param bool $withFormatting Keep the spacing a human would read, rather than digits only
      */
     public function forMobile(?string $input, string $from, ?string $country = null, bool $withFormatting = false): ?string
     {
