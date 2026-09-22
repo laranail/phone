@@ -1,9 +1,10 @@
 # laranail/phone
 
-[![Latest version on Packagist](https://img.shields.io/packagist/v/laranail/phone.svg)](https://packagist.org/packages/laranail/phone)
 [![Tests](https://github.com/laranail/phone/actions/workflows/tests.yml/badge.svg)](https://github.com/laranail/phone/actions/workflows/tests.yml)
 [![Static analysis](https://github.com/laranail/phone/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/laranail/phone/actions/workflows/static-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+`laranail/phone` is not published to Packagist, so there is no registry-version badge to show — see [Install](#install).
 
 > Phone numbers for Laravel — a fluent API over libphonenumber, from one number to a whole list: parsing, normalisation, validity with a reason, free-text scanning, per-country masks, Eloquent casts, batch auditing and an opt-in HTTP API.
 
