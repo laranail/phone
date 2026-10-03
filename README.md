@@ -25,6 +25,22 @@ php artisan vendor:publish --tag=laranail::phone-config
 
 Config resolves under the vendor-namespaced key `config('laranail.phone.*')`.
 
+## Quick start
+
+```php
+use Simtabi\Laranail\Phone\Facades\Phone;
+
+$number = Phone::parse('0712 123456', 'KE');
+
+$number->e164;           // '+254712123456' -- the form to store
+$number->international;  // '+254 712 123456'
+$number->isValid;        // true
+
+Phone::parse('call reception')->isEmpty();   // true -- junk never throws
+```
+
+The full walkthrough is in [Getting started](docs/getting-started.md); everything else is in the [documentation index](#documentation).
+
 ## <a name="documentation"></a>Documentation
 
 Full documentation is at
