@@ -25,7 +25,15 @@ php artisan vendor:publish --tag=laranail::phone-config
 
 Config resolves under the vendor-namespaced key `config('laranail.phone.*')`.
 
-## Quick start
+## Quick start guide and usage
+
+### Getting started
+
+Nothing to configure: the service provider and the `Phone` facade are auto-discovered, and publishing
+the config is optional. Installing the package adds no routes; the HTTP API stays off until you enable
+it.
+
+### Usage
 
 ```php
 use Simtabi\Laranail\Phone\Facades\Phone;
@@ -37,6 +45,25 @@ $number->international;  // '+254 712 123456'
 $number->isValid;        // true
 
 Phone::parse('call reception')->isEmpty();   // true -- junk never throws
+```
+
+Store E.164 with the migration macro and the cast:
+
+```php
+Schema::create('contacts', function (Blueprint $table): void {
+    $table->id();
+    $table->phoneNumber();   // `phone` varchar(20) + `phone_country` char(2) + an index
+    $table->timestamps();
+});
+```
+
+```php
+use Simtabi\Laranail\Phone\Casts\AsPhoneNumber;
+
+protected function casts(): array
+{
+    return ['phone' => AsPhoneNumber::class . ':phone_country'];
+}
 ```
 
 The full walkthrough is in [Getting started](docs/getting-started.md); everything else is in the [documentation index](#documentation).
