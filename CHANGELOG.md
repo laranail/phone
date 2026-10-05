@@ -79,6 +79,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `laravel/framework ^13.0` is now declared in `require`. `src/` uses `Dispatchable` from `Illuminate\Foundation`, which no `illuminate/*` component ships, so the dependency only arrived through the host application.
 - **A parse failure now reports why.** `PhoneNumberValue::possibility()` had nothing to go on once
   libphonenumber had thrown, and guessed `INVALID_COUNTRY_CODE` for everything — so an audit of a
   truncated CSV column reported a column of unknown calling codes, which sends an operator looking in
