@@ -37,39 +37,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and an over-sized batch is a 422 rather than a silent truncation.
 - `PossibilityReason::NotANumber`, for a string the parser refused outright.
 
-### Changed
-
-- **A parse failure now reports why.** `PhoneNumberValue::possibility()` had nothing to go on once
-  libphonenumber had thrown, and guessed `INVALID_COUNTRY_CODE` for everything — so an audit of a
-  truncated CSV column reported a column of unknown calling codes, which sends an operator looking in
-  exactly the wrong place. The exception's error type is now recorded on the value object and
-  preferred.
-- PHPStan raised from level 8 to `max`, matching `laranail/email`. That surfaced two real cases: the
-  Eloquent casts turned a non-string column value into a string with `(string)`, so an array in a
-  phone column became the value object `"Array"` instead of null, and the service provider read
-  `config()` values that a wrong `.env` entry could make any type at all.
-- The `Without ext-intl` CI leg had never removed the extension. Leaving it off setup-php's list is a
-  no-op — the runner's PHP ships with intl enabled — so the job ran identically to the four matrix
-  legs while claiming to prove the fallback. Its own assertion caught this and turned the workflow
-  red, which is the assertion working. The comment above it was also describing a design the package
-  no longer has: it deals in ISO codes and never resolves a country name, so what the leg is worth
-  keeping for is the claim that ext-intl is a *suggest* rather than a requirement.
-- `config/phone.php` — the `masks` block had been separated from its own documentation by a later
-  insertion, so the file read as if `scanning` were the mask configuration.
-
-- `laranail/atlas` moved from `require` to `require-dev`. It was a hard dependency used nowhere in
-  `src/` — this package deals in ISO 3166-1 alpha-2 codes and never resolves a country *name* — so it
-  dragged the ISO catalogue into every consumer for nothing. The `ext-intl` and `symfony/intl`
-  suggestions were corrected to match: neither is used here either.
-
-### Fixed
-
-- `MaskGenerator::placeholder()` was not memoised while `national()` and `international()` were, so
-  every call re-read a region's metadata. Building a table for all 245 regions cost 210 ms on a pass
-  where the masks themselves were already cached and free; it is now 2.7 ms.
-
-### Added
-
 - `Phone::of()` — a fluent builder. Narrow with `country()`/`from()`/`type()`, then ask: `isValid()`,
   `why()`, `masked()`, `dialFrom()`, `areaCode()`, `matches()`. Immutable, and the parse is memoised
   so twenty questions about one number cost one parse.
@@ -109,5 +76,36 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `AsPhoneNumber` and `E164` Eloquent casts.
 - `PhoneNumberFactory` — valid, country-correct numbers for factories and seeders.
 - A `phoneNumber()` Blueprint macro creating the number column, its country column and an index.
+
+### Changed
+
+- **A parse failure now reports why.** `PhoneNumberValue::possibility()` had nothing to go on once
+  libphonenumber had thrown, and guessed `INVALID_COUNTRY_CODE` for everything — so an audit of a
+  truncated CSV column reported a column of unknown calling codes, which sends an operator looking in
+  exactly the wrong place. The exception's error type is now recorded on the value object and
+  preferred.
+- PHPStan raised from level 8 to `max`, matching `laranail/email`. That surfaced two real cases: the
+  Eloquent casts turned a non-string column value into a string with `(string)`, so an array in a
+  phone column became the value object `"Array"` instead of null, and the service provider read
+  `config()` values that a wrong `.env` entry could make any type at all.
+- The `Without ext-intl` CI leg had never removed the extension. Leaving it off setup-php's list is a
+  no-op — the runner's PHP ships with intl enabled — so the job ran identically to the four matrix
+  legs while claiming to prove the fallback. Its own assertion caught this and turned the workflow
+  red, which is the assertion working. The comment above it was also describing a design the package
+  no longer has: it deals in ISO codes and never resolves a country name, so what the leg is worth
+  keeping for is the claim that ext-intl is a *suggest* rather than a requirement.
+- `config/phone.php` — the `masks` block had been separated from its own documentation by a later
+  insertion, so the file read as if `scanning` were the mask configuration.
+
+- `laranail/atlas` moved from `require` to `require-dev`. It was a hard dependency used nowhere in
+  `src/` — this package deals in ISO 3166-1 alpha-2 codes and never resolves a country *name* — so it
+  dragged the ISO catalogue into every consumer for nothing. The `ext-intl` and `symfony/intl`
+  suggestions were corrected to match: neither is used here either.
+
+### Fixed
+
+- `MaskGenerator::placeholder()` was not memoised while `national()` and `international()` were, so
+  every call re-read a region's metadata. Building a table for all 245 regions cost 210 ms on a pass
+  where the masks themselves were already cached and free; it is now 2.7 ms.
 
 [Unreleased]: https://github.com/laranail/phone/commits/main
