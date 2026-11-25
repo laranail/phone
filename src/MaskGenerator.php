@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
+use libphonenumber\PhoneMetadata;
 use libphonenumber\PhoneNumberUtil;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
@@ -111,7 +112,7 @@ final class MaskGenerator
 
         $example = $this->formatter->example($country, $type);
 
-        if ($example === null) {
+        if (! $example instanceof PhoneNumberValue) {
             return null;
         }
 
@@ -134,7 +135,7 @@ final class MaskGenerator
     {
         $metadata = $this->util->getMetadataForRegion($country);
 
-        if ($metadata === null) {
+        if (! $metadata instanceof PhoneMetadata) {
             return false;
         }
 

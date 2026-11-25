@@ -95,7 +95,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
         // the string never became a number, and re-deriving from an object that does not exist can
         // only guess. An earlier version guessed `INVALID_COUNTRY_CODE` for everything here, which
         // reported a column of truncated numbers as a column of unknown calling codes.
-        if ($this->failure !== null) {
+        if ($this->failure instanceof PossibilityReason) {
             return $this->failure;
         }
 
@@ -327,7 +327,7 @@ final readonly class PhoneNumberValue implements JsonSerializable, Stringable
     /** Whether two numbers are the same, comparing E.164 and ignoring how each was written. */
     public function equals(?self $other): bool
     {
-        if ($other === null || $this->e164 === null || $other->e164 === null) {
+        if (! $other instanceof PhoneNumberValue || $this->e164 === null || $other->e164 === null) {
             return false;
         }
 

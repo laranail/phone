@@ -46,7 +46,7 @@ final class PhoneIntel implements ResolvesPhoneIntel
     {
         $parsed = $this->reparse($number);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof LibPhoneNumber) {
             return null;
         }
 
@@ -64,7 +64,7 @@ final class PhoneIntel implements ResolvesPhoneIntel
     {
         $parsed = $this->reparse($number);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof LibPhoneNumber) {
             return null;
         }
 
@@ -82,7 +82,7 @@ final class PhoneIntel implements ResolvesPhoneIntel
     {
         $parsed = $this->reparse($number);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof LibPhoneNumber) {
             return [];
         }
 

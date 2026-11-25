@@ -65,7 +65,7 @@ final readonly class PhoneFormatter
             return new PhoneNumberValue(
                 raw: $normalized,
                 intel: $this->intel,
-                failure: $failure === null ? null : PossibilityReason::fromParseException($failure),
+                failure: $failure instanceof NumberParseException ? PossibilityReason::fromParseException($failure) : null,
             );
         }
 

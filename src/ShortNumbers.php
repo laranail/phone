@@ -40,7 +40,7 @@ final readonly class ShortNumbers
     {
         $parsed = $this->parse($input, $region);
 
-        return $parsed !== null && $this->info->isValidShortNumberForRegion($parsed, strtoupper($region));
+        return $parsed instanceof PhoneNumber && $this->info->isValidShortNumberForRegion($parsed, strtoupper($region));
     }
 
     /** Whether it is merely short enough to be one, allocated or not. */
@@ -48,7 +48,7 @@ final readonly class ShortNumbers
     {
         $parsed = $this->parse($input, $region);
 
-        return $parsed !== null && $this->info->isPossibleShortNumberForRegion($parsed, strtoupper($region));
+        return $parsed instanceof PhoneNumber && $this->info->isPossibleShortNumberForRegion($parsed, strtoupper($region));
     }
 
     /**
@@ -78,9 +78,9 @@ final readonly class ShortNumbers
     {
         $parsed = $this->parse($input, $region);
 
-        return $parsed === null
-            ? null
-            : ShortNumberCost::fromLibPhoneNumber($this->info->getExpectedCostForRegion($parsed, strtoupper($region)));
+        return $parsed instanceof PhoneNumber
+            ? ShortNumberCost::fromLibPhoneNumber($this->info->getExpectedCostForRegion($parsed, strtoupper($region)))
+            : null;
     }
 
     /** Whether it only works on one carrier's network. */
@@ -88,7 +88,7 @@ final readonly class ShortNumbers
     {
         $parsed = $this->parse($input, $region);
 
-        return $parsed !== null && $this->info->isCarrierSpecificForRegion($parsed, strtoupper($region));
+        return $parsed instanceof PhoneNumber && $this->info->isCarrierSpecificForRegion($parsed, strtoupper($region));
     }
 
     /** Whether it accepts SMS rather than only voice. */
@@ -96,7 +96,7 @@ final readonly class ShortNumbers
     {
         $parsed = $this->parse($input, $region);
 
-        return $parsed !== null && $this->info->isSmsServiceForRegion($parsed, strtoupper($region));
+        return $parsed instanceof PhoneNumber && $this->info->isSmsServiceForRegion($parsed, strtoupper($region));
     }
 
     /** A real short code for the region, for tests and placeholders. */

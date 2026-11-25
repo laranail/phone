@@ -40,9 +40,9 @@ final readonly class PhoneDialler
     {
         $parsed = $this->parse($input, $country);
 
-        return $parsed === null
-            ? null
-            : $this->util->formatOutOfCountryCallingNumber($parsed, strtoupper($from));
+        return $parsed instanceof PhoneNumber
+            ? $this->util->formatOutOfCountryCallingNumber($parsed, strtoupper($from))
+            : null;
     }
 
     /**
@@ -58,9 +58,9 @@ final readonly class PhoneDialler
     {
         $parsed = $this->parse($input, $country);
 
-        return $parsed === null
-            ? null
-            : $this->util->formatNumberForMobileDialing($parsed, strtoupper($from), $withFormatting);
+        return $parsed instanceof PhoneNumber
+            ? $this->util->formatNumberForMobileDialing($parsed, strtoupper($from), $withFormatting)
+            : null;
     }
 
     /**
@@ -74,7 +74,7 @@ final readonly class PhoneDialler
     {
         $parsed = $this->parse($input, $country);
 
-        return $parsed !== null && $this->util->canBeInternationallyDialled($parsed);
+        return $parsed instanceof PhoneNumber && $this->util->canBeInternationallyDialled($parsed);
     }
 
     /**
@@ -108,7 +108,7 @@ final readonly class PhoneDialler
     {
         $parsed = $this->parse($input, $country);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof PhoneNumber) {
             return null;
         }
 
