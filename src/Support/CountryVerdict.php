@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone\Support;
 
-use Simtabi\Laranail\Phone\CountryReconciler;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
+use Simtabi\Laranail\Phone\CountryReconciler;
 
 /**
  * The outcome of {@see CountryReconciler::reconcile()}.

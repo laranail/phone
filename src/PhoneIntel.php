@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use libphonenumber\geocoding\PhoneNumberOfflineGeocoder;
+use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
-use libphonenumber\PhoneNumber as LibPhoneNumber;
 use libphonenumber\PhoneNumberToCarrierMapper;
 use libphonenumber\PhoneNumberToTimeZonesMapper;
-use libphonenumber\PhoneNumberUtil;
+use libphonenumber\PhoneNumber as LibPhoneNumber;
+use libphonenumber\geocoding\PhoneNumberOfflineGeocoder;
 use Simtabi\Laranail\Phone\Contracts\ResolvesPhoneIntel;
 
 /**
@@ -46,7 +46,7 @@ final class PhoneIntel implements ResolvesPhoneIntel
     {
         $parsed = $this->reparse($number);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof LibPhoneNumber) {
             return null;
         }
 
@@ -64,7 +64,7 @@ final class PhoneIntel implements ResolvesPhoneIntel
     {
         $parsed = $this->reparse($number);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof LibPhoneNumber) {
             return null;
         }
 
@@ -82,7 +82,7 @@ final class PhoneIntel implements ResolvesPhoneIntel
     {
         $parsed = $this->reparse($number);
 
-        if ($parsed === null) {
+        if (! $parsed instanceof LibPhoneNumber) {
             return [];
         }
 

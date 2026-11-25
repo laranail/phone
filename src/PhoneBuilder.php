@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
-use InvalidArgumentException;
-use JsonSerializable;
-use Simtabi\Laranail\Phone\Enums\MatchStrength;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\Enums\PossibilityReason;
-use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
 use Stringable;
+use JsonSerializable;
+use InvalidArgumentException;
+use Simtabi\Laranail\Phone\Enums\MatchStrength;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PossibilityReason;
 
 /**
  * The fluent entry point: say what you have, then ask what you want.
@@ -334,7 +334,7 @@ final class PhoneBuilder implements JsonSerializable, Stringable
         if ($resolved === null) {
             throw new InvalidArgumentException(
                 'Short-code checks need a region: a short code carries no calling code, so there is '
-                .'nothing to infer one from. Pass it to the method or set it with ->country().',
+                . 'nothing to infer one from. Pass it to the method or set it with ->country().',
             );
         }
 

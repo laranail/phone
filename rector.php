@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\SetList;
 
@@ -13,14 +12,13 @@ use Rector\Set\ValueObject\SetList;
  * supported version.
  */
 return RectorConfig::configure()
-    ->withPaths([__DIR__.'/src', __DIR__.'/tests'])
+    ->withPaths([__DIR__ . '/src', __DIR__ . '/tests'])
     ->withSkip([
-        __DIR__.'/vendor',
+        __DIR__ . '/vendor',
 
         // Rewrites `$x === null` into `! $x instanceof \Fully\Qualified\Name`, inlining an FQCN into
         // a condition that was already clear. For a `?self` parameter the null check *is* the
         // intent, and the instanceof form reads as a type guard that is not what the code means.
-        FlipTypeControlToUseExclusiveTypeRector::class,
     ])
     ->withPhpSets(php84: true)
     ->withSets([

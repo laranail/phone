@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use Generator;
+use Stringable;
 use Simtabi\Laranail\Phone\Support\PhoneAudit;
 use Simtabi\Laranail\Phone\Support\PhoneAuditEntry;
 use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
-use Stringable;
 
 /**
  * Judges a list of numbers in one pass.
@@ -41,8 +41,8 @@ final readonly class PhoneBatch
     /**
      * Parse every input and return the whole verdict.
      *
-     * @param  iterable<mixed, string|null>  $inputs
-     * @param  string|null  $country  Region for bare national input; ignored for anything carrying a `+`
+     * @param iterable<mixed, string|null> $inputs
+     * @param string|null $country Region for bare national input; ignored for anything carrying a `+`
      */
     public function audit(iterable $inputs, ?string $country = null): PhoneAudit
     {
@@ -56,7 +56,8 @@ final readonly class PhoneBatch
      * O(distinct), not O(n). What is given up is the report: nothing here can tell you the totals
      * until the generator is exhausted, and by then the entries are gone.
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
+     *
      * @return Generator<int, PhoneAuditEntry>
      */
     public function each(iterable $inputs, ?string $country = null): Generator
@@ -71,7 +72,7 @@ final readonly class PhoneBatch
             // Keyed on the raw input *and* the country, because the same digits parse differently
             // against different regions and a batch may be given only one of them — but a caller
             // narrowing per row would otherwise get the first row's answer for all of them.
-            $key = $country."\0".$input;
+            $key = $country . "\0" . $input;
 
             $number = $parsed[$key] ??= $this->formatter->parse($input, $country);
 
@@ -109,7 +110,7 @@ final readonly class PhoneBatch
      * cannot afterwards ask which rows to keep. Use `each()` alongside it if you need both, or the
      * duplicate groups, which carry the indexes.
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
      */
     public function report(iterable $inputs, ?string $country = null): PhoneAuditReport
     {
@@ -130,7 +131,8 @@ final readonly class PhoneBatch
      * are dropped rather than passed through — this method's contract is that everything it returns
      * is a real number.
      *
-     * @param  iterable<mixed, string|null>  $inputs
+     * @param iterable<mixed, string|null> $inputs
+     *
      * @return list<string>
      */
     public function e164(iterable $inputs, ?string $country = null, bool $validOnly = true): array

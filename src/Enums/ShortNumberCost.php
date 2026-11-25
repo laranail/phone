@@ -23,10 +23,10 @@ enum ShortNumberCost: string
     public static function fromLibPhoneNumber(LibCost $cost): self
     {
         return match ($cost) {
-            LibCost::TOLL_FREE => self::TollFree,
+            LibCost::TOLL_FREE     => self::TollFree,
             LibCost::STANDARD_RATE => self::StandardRate,
-            LibCost::PREMIUM_RATE => self::PremiumRate,
-            LibCost::UNKNOWN_COST => self::Unknown,
+            LibCost::PREMIUM_RATE  => self::PremiumRate,
+            LibCost::UNKNOWN_COST  => self::Unknown,
         };
     }
 
@@ -39,10 +39,10 @@ enum ShortNumberCost: string
     public function label(): string
     {
         return match ($this) {
-            self::TollFree => 'Toll free',
+            self::TollFree     => 'Toll free',
             self::StandardRate => 'Standard rate',
-            self::PremiumRate => 'Premium rate',
-            self::Unknown => 'Unknown cost',
+            self::PremiumRate  => 'Premium rate',
+            self::Unknown      => 'Unknown cost',
         };
     }
 }
