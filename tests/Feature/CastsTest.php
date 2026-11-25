@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Schema;
-use Simtabi\Laranail\Phone\Casts\E164;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Simtabi\Laranail\Phone\Casts\AsPhoneNumber;
+use Simtabi\Laranail\Phone\Casts\E164;
 use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
-use Simtabi\Laranail\Phone\Casts\AsPhoneNumber;
 
 beforeEach(function (): void {
     Schema::create('contacts', function (Blueprint $table): void {
@@ -30,8 +30,8 @@ final class Contact extends Model
     protected function casts(): array
     {
         return [
-            'phone'  => AsPhoneNumber::class . ':phone_country',
-            'sms_to' => E164::class . ':KE',
+            'phone' => AsPhoneNumber::class.':phone_country',
+            'sms_to' => E164::class.':KE',
         ];
     }
 }
@@ -71,7 +71,7 @@ it('canonicalises regardless of attribute assignment order', function (array $in
     expect($stored->getRawOriginal('phone'))->toBe('+254712345678')
         ->and($stored->getRawOriginal('phone_country'))->toBe('KE');
 })->with([
-    'number first'  => [['phone' => '0712 345678', 'phone_country' => 'KE']],
+    'number first' => [['phone' => '0712 345678', 'phone_country' => 'KE']],
     'country first' => [['phone_country' => 'KE', 'phone' => '0712 345678']],
 ]);
 

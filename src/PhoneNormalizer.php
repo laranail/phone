@@ -163,7 +163,7 @@ final readonly class PhoneNormalizer
             return null;
         }
 
-        return $extension === null ? $number : $number . ';ext=' . $extension;
+        return $extension === null ? $number : $number.';ext='.$extension;
     }
 
     /** Digits only, with a leading `+` if there was one. Useful for comparison, never for storage. */
@@ -177,7 +177,7 @@ final readonly class PhoneNormalizer
 
         $plus = str_starts_with($value, '+') ? '+' : '';
 
-        return $plus . preg_replace('/\D/', '', $value);
+        return $plus.preg_replace('/\D/', '', $value);
     }
 
     private function stripInvisible(string $value): string
@@ -234,7 +234,7 @@ final readonly class PhoneNormalizer
                 continue;
             }
 
-            return '+' . $remainder;
+            return '+'.$remainder;
         }
 
         return $value;
@@ -255,8 +255,8 @@ final readonly class PhoneNormalizer
         }
 
         $pattern = '/^(.*?\d)\s*(?:'
-            . 'x|ext|ext\.|extn|extension|#'
-            . ')[\s.:-]*(\d{1,7})\s*$/i';
+            .'x|ext|ext\.|extn|extension|#'
+            .')[\s.:-]*(\d{1,7})\s*$/i';
 
         if (preg_match($pattern, $value, $m) === 1) {
             return [trim($m[1]), $m[2]];

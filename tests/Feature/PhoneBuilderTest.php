@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Phone\Facades\Phone;
 use Simtabi\Laranail\Phone\Enums\MatchLeniency;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
-use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\Enums\PossibilityReason;
+use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
+use Simtabi\Laranail\Phone\Facades\Phone;
 
 // =========================================================================
 // The fluent chain
@@ -153,7 +153,7 @@ it('replaces backwards, so later offsets stay valid', function (): void {
     // replacement lands in the wrong place. Two numbers with a long replacement proves the order.
     $out = Phone::replaceIn(
         'a 0712 123456 b 0722 123456 c',
-        static fn ($match): string => '[' . $match->number->e164 . ']',
+        static fn ($match): string => '['.$match->number->e164.']',
         'KE',
     );
 

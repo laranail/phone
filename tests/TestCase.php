@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone\Tests;
 
 use Simtabi\Laranail\Atlas\Providers\AtlasServiceProvider;
-use Simtabi\Laranail\Phone\Providers\PhoneServiceProvider;
 use Simtabi\Laranail\Package\Tools\Testing\IsolatedTestCase;
+use Simtabi\Laranail\Phone\Providers\PhoneServiceProvider;
 
 /**
  * Base case for tests that need a booted Laravel application.

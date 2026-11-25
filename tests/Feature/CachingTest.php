@@ -16,7 +16,7 @@ use Simtabi\Laranail\Phone\Http\ApiRoutes;
 */
 
 it('ships a config file with no closures in it', function (): void {
-    $config = require dirname(__DIR__, 2) . '/config/phone.php';
+    $config = require dirname(__DIR__, 2).'/config/phone.php';
 
     $walk = function (array $values) use (&$walk): void {
         foreach ($values as $value) {

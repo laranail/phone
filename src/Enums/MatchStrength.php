@@ -32,11 +32,11 @@ enum MatchStrength: string
     public static function fromLibPhoneNumber(MatchType $type): self
     {
         return match ($type) {
-            MatchType::NOT_A_NUMBER    => self::NotANumber,
-            MatchType::NO_MATCH        => self::NoMatch,
+            MatchType::NOT_A_NUMBER => self::NotANumber,
+            MatchType::NO_MATCH => self::NoMatch,
             MatchType::SHORT_NSN_MATCH => self::ShortNsnMatch,
-            MatchType::NSN_MATCH       => self::NsnMatch,
-            MatchType::EXACT_MATCH     => self::ExactMatch,
+            MatchType::NSN_MATCH => self::NsnMatch,
+            MatchType::EXACT_MATCH => self::ExactMatch,
         };
     }
 
@@ -55,11 +55,11 @@ enum MatchStrength: string
     public function label(): string
     {
         return match ($this) {
-            self::NotANumber    => 'Not a number',
-            self::NoMatch       => 'Different numbers',
+            self::NotANumber => 'Not a number',
+            self::NoMatch => 'Different numbers',
             self::ShortNsnMatch => 'Possibly the same, area code missing',
-            self::NsnMatch      => 'Same national number',
-            self::ExactMatch    => 'Identical',
+            self::NsnMatch => 'Same national number',
+            self::ExactMatch => 'Identical',
         };
     }
 }

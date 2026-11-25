@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
-use Simtabi\Laranail\Phone\PhoneBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Simtabi\Laranail\Phone\Facades\Phone;
 use Simtabi\Laranail\Phone\Jobs\AuditPhoneColumn;
+use Simtabi\Laranail\Phone\PhoneBatch;
 use Simtabi\Laranail\Phone\Support\PhoneAuditReport;
 
 /*
@@ -141,7 +141,7 @@ describe('the queued job', function (): void {
 
     it('publishes progress as it goes', function (): void {
         AuditableContact::insert(array_map(
-            static fn (int $i): array => ['phone' => '+2547121234' . str_pad((string) $i, 2, '0', STR_PAD_LEFT), 'active' => true],
+            static fn (int $i): array => ['phone' => '+2547121234'.str_pad((string) $i, 2, '0', STR_PAD_LEFT), 'active' => true],
             range(1, 5),
         ));
 

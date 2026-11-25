@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Phone;
 
+use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumber;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\ShortNumberInfo;
-use libphonenumber\NumberParseException;
 use Simtabi\Laranail\Phone\Enums\ShortNumberCost;
 
 /**

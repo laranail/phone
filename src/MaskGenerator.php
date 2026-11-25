@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Phone;
 
 use libphonenumber\PhoneNumberUtil;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberFormat;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 
 /**
  * Builds an input-mask template for a country, from libphonenumber's own example numbers.
@@ -51,7 +51,7 @@ final class MaskGenerator
     /**
      * A national-format mask for a country, or null when one would be a lie.
      *
-     * @param string $country ISO 3166-1 alpha-2
+     * @param  string  $country  ISO 3166-1 alpha-2
      */
     public function national(string $country, PhoneNumberType $type = PhoneNumberType::Mobile): ?string
     {
@@ -82,7 +82,7 @@ final class MaskGenerator
     public function placeholder(string $country, PhoneNumberType $type = PhoneNumberType::Mobile): ?string
     {
         $country = strtoupper($country);
-        $key = $country . '|' . $type->value . '|placeholder';
+        $key = $country.'|'.$type->value.'|placeholder';
 
         if (array_key_exists($key, $this->memo)) {
             return $this->memo[$key];
@@ -94,7 +94,7 @@ final class MaskGenerator
     private function build(string $country, PhoneNumberType $type, PhoneNumberFormat $format): ?string
     {
         $country = strtoupper($country);
-        $key = $country . '|' . $type->value . '|' . $format->value;
+        $key = $country.'|'.$type->value.'|'.$format->value;
 
         if (array_key_exists($key, $this->memo)) {
             return $this->memo[$key];
@@ -139,10 +139,10 @@ final class MaskGenerator
         }
 
         $descriptor = match ($type) {
-            PhoneNumberType::Mobile    => $metadata->getMobile(),
+            PhoneNumberType::Mobile => $metadata->getMobile(),
             PhoneNumberType::FixedLine => $metadata->getFixedLine(),
-            PhoneNumberType::TollFree  => $metadata->getTollFree(),
-            default                    => null,
+            PhoneNumberType::TollFree => $metadata->getTollFree(),
+            default => null,
         };
 
         $lengths = $descriptor?->getPossibleLength() ?? [];

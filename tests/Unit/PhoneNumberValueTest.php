@@ -38,15 +38,15 @@ it('compares numbers by value, not by how they were written', function (): void 
 
 it('serialises to a stable array shape', function (): void {
     expect($this->mobile->toArray())->toMatchArray([
-        'e164'          => '+905301111111',
-        'national'      => '0530 111 11 11',
+        'e164' => '+905301111111',
+        'national' => '0530 111 11 11',
         'international' => '+90 530 111 11 11',
-        'rfc3966'       => 'tel:+90-530-111-11-11',
-        'country'       => 'TR',
-        'calling_code'  => 90,
-        'type'          => 'MOBILE',
-        'is_valid'      => true,
-        'is_possible'   => true,
+        'rfc3966' => 'tel:+90-530-111-11-11',
+        'country' => 'TR',
+        'calling_code' => 90,
+        'type' => 'MOBILE',
+        'is_valid' => true,
+        'is_possible' => true,
     ]);
 
     expect(json_decode(json_encode($this->mobile, JSON_THROW_ON_ERROR), true))->toBe($this->mobile->toArray());

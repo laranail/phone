@@ -36,10 +36,10 @@ enum PhoneNumberFormat: string
     public static function fromLibPhoneNumber(LibFormat $format): self
     {
         return match ($format) {
-            LibFormat::E164          => self::E164,
+            LibFormat::E164 => self::E164,
             LibFormat::INTERNATIONAL => self::International,
-            LibFormat::NATIONAL      => self::National,
-            LibFormat::RFC3966       => self::Rfc3966,
+            LibFormat::NATIONAL => self::National,
+            LibFormat::RFC3966 => self::Rfc3966,
         };
     }
 
@@ -54,10 +54,10 @@ enum PhoneNumberFormat: string
     public function toLibPhoneNumber(): LibFormat
     {
         return match ($this) {
-            self::E164          => LibFormat::E164,
+            self::E164 => LibFormat::E164,
             self::International => LibFormat::INTERNATIONAL,
-            self::National      => LibFormat::NATIONAL,
-            self::Rfc3966       => LibFormat::RFC3966,
+            self::National => LibFormat::NATIONAL,
+            self::Rfc3966 => LibFormat::RFC3966,
         };
     }
 
@@ -76,10 +76,10 @@ enum PhoneNumberFormat: string
     public function label(): string
     {
         return match ($this) {
-            self::E164          => 'E.164',
+            self::E164 => 'E.164',
             self::International => 'International',
-            self::National      => 'National',
-            self::Rfc3966       => 'RFC 3966 (tel: URI)',
+            self::National => 'National',
+            self::Rfc3966 => 'RFC 3966 (tel: URI)',
         };
     }
 }
